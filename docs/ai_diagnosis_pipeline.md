@@ -109,3 +109,33 @@ Supporting Evidence
 Recommended Recovery
 Prevention Recommendations
 Confidence Score
+
+
+## Why This Design?
+
+The AI Diagnosis Pipeline separates deterministic reasoning from generative reasoning.
+
+* Deterministic Components (Python)
+
+Python is responsible for tasks that require consistent and repeatable results, including:
+Parsing UiPath execution logs
+Extracting exceptions and execution context
+Classifying incidents using the Incident Catalog
+Retrieving relevant root causes from the Root Cause Library
+Retrieving recovery actions from the Recovery Library
+
+* Generative Component (LLM)
+
+The Large Language Model (LLM) is responsible for tasks that benefit from natural language understanding and generation, including:
+Explaining the incident in human-readable language
+Summarizing probable root causes
+Generating professional RCA reports
+Providing clear recovery and prevention recommendations
+
+* Benefits of This Design
+
+Reduces LLM hallucinations by grounding responses in a structured knowledge base.
+Ensures consistent incident classification through deterministic logic.
+Improves reliability and explainability of AI-generated reports.
+Enables independent updates to the knowledge base without modifying the AI model.
+Provides a scalable architecture for future enterprise RPA incident management systems.
