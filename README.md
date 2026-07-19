@@ -67,7 +67,7 @@ intelligent-rpa-rca/
 
 ## Development Roadmap
 
-### ✅ Sprint 1 — Knowledge Base Design
+### ✅ Sprint 1 — Knowledge Base Design (Completed)
 
 - Incident Taxonomy
 - Recovery Library
@@ -76,11 +76,11 @@ intelligent-rpa-rca/
 - RCA Report Template
 - Research of Existing Solutions
 
-### 🚧 Sprint 2 — MVP Development
+### Sprint 2 — MVP Development
 
 - Backend Setup
-- Knowledge Base Loader ✅
-- Log Parser
+- Knowledge Base Loader 
+- Log Parser (Currently working on)
 - Incident Classification Engine
 - Root Cause Retrieval
 - Recovery Recommendation Engine
@@ -88,16 +88,6 @@ intelligent-rpa-rca/
 - RCA Report Generator
 - REST API
 - Testing
-
----
-
-## Current Status
-
-**Current Sprint:** Sprint 2 — MVP Development
-
-**Completed Issues**
-- Backend Setup
-- Knowledge Base Loader
 
 ---
 
