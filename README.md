@@ -67,7 +67,7 @@ intelligent-rpa-rca/
 
 ## Development Roadmap
 
-### ✅ Sprint 1 — Knowledge Base Design (Completed)
+### Sprint 1 — Knowledge Base Design (Completed)
 
 - Incident Taxonomy
 - Recovery Library
