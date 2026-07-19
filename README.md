@@ -1,11 +1,117 @@
-# Intelligent-RPA-RCA
-AI assisted RPA incident diagnosis platform for log analysis, root cause analysis (RCA), and recovery recommendations
+# Intelligent RPA RCA
+
+An AI-assisted Root Cause Analysis (RCA) platform for Robotic Process Automation (RPA) incidents. The system analyzes UiPath execution logs, identifies probable root causes, recommends recovery actions, and generates professional RCA reports using a structured knowledge base and Large Language Models (LLMs).
+
+---
 
 ## Problem
-RPA Developers spend significant time diagnosing automation failures.
 
-## Goal
-Build and AI assistant that analyzes automation logs, identifies probable root causes, generates RCA reports and recommends recovery actions.
+Enterprise RPA developers spend significant time manually diagnosing production automation failures. Existing tools primarily focus on retries and self-healing but provide limited support for structured incident diagnosis and engineering-quality RCA reports.
+
+---
+
+## Project Goal
+
+Build an intelligent assistant that can:
+
+- Parse UiPath execution logs
+- Classify automation incidents
+- Retrieve similar historical incidents
+- Identify probable root causes
+- Recommend recovery actions
+- Generate professional RCA reports
+- Assist RPA developers during production support
+
+---
+
+## Features
+
+- Knowledge Base Loader
+- Log Parser
+- Incident Classification Engine
+- Root Cause Retrieval
+- Recovery Recommendation Engine
+- AI-assisted RCA Generation
+- FastAPI Backend
+- Extensible Knowledge Base
+
+---
+
+## Project Structure
+
+```text
+intelligent-rpa-rca/
+│
+├── backend/
+├── dataset/
+├── knowledge_base/
+├── docs/
+├── tests/
+├── frontend/
+├── README.md
+└── LICENSE
+```
+
+---
+
+## Technology Stack
+
+- Python
+- FastAPI
+- Pandas
+- OpenPyXL
+- Git & GitHub
+- Large Language Models (LLMs)
+
+---
+
+## Development Roadmap
+
+### ✅ Sprint 1 — Knowledge Base Design
+
+- Incident Taxonomy
+- Recovery Library
+- Root Cause Library
+- AI Diagnosis Pipeline
+- RCA Report Template
+- Research of Existing Solutions
+
+### 🚧 Sprint 2 — MVP Development
+
+- Backend Setup
+- Knowledge Base Loader ✅
+- Log Parser
+- Incident Classification Engine
+- Root Cause Retrieval
+- Recovery Recommendation Engine
+- LLM Integration
+- RCA Report Generator
+- REST API
+- Testing
+
+---
 
 ## Current Status
-* Sprint 1 - Knowledge Base Design
+
+**Current Sprint:** Sprint 2 — MVP Development
+
+**Completed Issues**
+- Backend Setup
+- Knowledge Base Loader
+
+---
+
+## Future Work
+
+- Vector database integration
+- Semantic incident retrieval
+- Multi-agent reasoning
+- Self-healing recommendations
+- Web dashboard
+- Enterprise deployment
+
+---
+
+## License
+
+This project is currently under development.
