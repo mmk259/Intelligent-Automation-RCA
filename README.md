@@ -1,33 +1,37 @@
-# Intelligent RPA RCA
+# Intelligent Automation RCA
 
-An AI-assisted Root Cause Analysis (RCA) platform for Robotic Process Automation (RPA) incidents. The system analyzes UiPath execution logs, identifies probable root causes, recommends recovery actions, and generates professional RCA reports using a structured knowledge base and Large Language Models (LLMs).
+An AI-assisted Root Cause Analysis (RCA) platform for enterprise automation incidents. The system analyzes automation execution logs, identifies probable root causes, recommends recovery actions, and generates professional RCA reports using a structured knowledge base and Large Language Models (LLMs).
 
----
+**Initial implementation:** UiPath automation logs and incident knowledge.
 
-## Problem
-
-Enterprise RPA developers spend significant time manually diagnosing production automation failures. Existing tools primarily focus on retries and self-healing but provide limited support for structured incident diagnosis and engineering-quality RCA reports.
+**Long-term vision:** A platform-independent AI-assisted incident diagnosis framework for enterprise automation systems, supporting platforms such as UiPath, Automation Anywhere, Microsoft Power Automate, Blue Prism, and future automation technologies.
 
 ---
 
-## Project Goal
+# Problem
+
+Enterprise automation teams spend significant time manually diagnosing production automation failures. Existing platforms primarily focus on monitoring, retries, and self-healing but provide limited support for structured AI-assisted incident diagnosis, root cause reasoning, and engineering-quality RCA report generation.
+
+---
+
+# Project Goal
 
 Build an intelligent assistant that can:
 
-- Parse UiPath execution logs
+- Parse automation execution logs
 - Classify automation incidents
 - Retrieve similar historical incidents
 - Identify probable root causes
 - Recommend recovery actions
 - Generate professional RCA reports
-- Assist RPA developers during production support
+- Accelerate incident diagnosis and production support across enterprise automation platforms
 
 ---
 
-## Features
+# Features
 
 - Knowledge Base Loader
-- Log Parser
+- Automation Log Parser
 - Incident Classification Engine
 - Root Cause Retrieval
 - Recovery Recommendation Engine
@@ -37,10 +41,10 @@ Build an intelligent assistant that can:
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
-intelligent-rpa-rca/
+intelligent-automation-rca/
 │
 ├── backend/
 ├── dataset/
@@ -54,7 +58,7 @@ intelligent-rpa-rca/
 
 ---
 
-## Technology Stack
+# Technology Stack
 
 - Python
 - FastAPI
@@ -65,9 +69,9 @@ intelligent-rpa-rca/
 
 ---
 
-## Development Roadmap
+# Development Roadmap
 
-### Sprint 1 — Knowledge Base Design (Completed)
+## Sprint 1 — Knowledge Base Design (Completed)
 
 - Incident Taxonomy
 - Recovery Library
@@ -75,12 +79,13 @@ intelligent-rpa-rca/
 - AI Diagnosis Pipeline
 - RCA Report Template
 - Research of Existing Solutions
+- Iterative Development Plan
 
-### Sprint 2 — MVP Development
+## Sprint 2 — MVP Development
 
 - Backend Setup
-- Knowledge Base Loader 
-- Log Parser (Currently working on)
+- Knowledge Base Loader
+- Automation Log Parser *(Current)*
 - Incident Classification Engine
 - Root Cause Retrieval
 - Recovery Recommendation Engine
@@ -91,17 +96,19 @@ intelligent-rpa-rca/
 
 ---
 
-## Future Work
+# Future Work
 
+- Multi-platform log parsing
 - Vector database integration
 - Semantic incident retrieval
 - Multi-agent reasoning
-- Self-healing recommendations
+- AI-assisted recovery recommendations
 - Web dashboard
 - Enterprise deployment
+- Support for additional enterprise automation platforms
 
 ---
 
-## License
+# License
 
-This project is currently under development.
+This project is currently under active development.
