@@ -6,23 +6,29 @@ Intelligent RPA RCA is an AI-assisted incident diagnosis system for enterprise r
 ## System Workflow
 
 RPA Execution Log
+
         │
         ▼
 Exception Extraction
+
         │
         ▼
 Incident Classification
+
         │
         ▼
 Knowledge Base Retrieval
+
         │
         ├───────────────┐
         ▼               ▼
 Root Cause Library   Recovery Library
+
         │               │
         └───────┬───────┘
                 ▼
         LLM Reasoning Engine
+        
                 │
                 ▼
       Professional RCA Report
