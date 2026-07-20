@@ -8,7 +8,9 @@ The AI Diagnosis Pipeline transforms raw UiPath execution logs into a structured
 
 ## Pipeline Workflow
 
+----
 UiPath Execution Log
+----
         │
         ▼
 Log Parser
