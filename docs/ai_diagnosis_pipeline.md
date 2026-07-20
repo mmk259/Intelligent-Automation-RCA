@@ -9,7 +9,11 @@ The AI Diagnosis Pipeline transforms raw automation execution logs into a struct
 # Pipeline Workflow
 
 ```text
-Automation Execution Log
+Enterprise Automation Platform
+        │
+(API / Log Export/ Webhook)
+        ▼
+Platform Connector
         │
         ▼
 Automation Log Parser
