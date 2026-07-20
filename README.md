@@ -2,7 +2,8 @@
 
 An AI-assisted Root Cause Analysis (RCA) platform for enterprise automation incidents. The system analyzes automation execution logs, identifies probable root causes, recommends recovery actions, and generates professional RCA reports using a structured knowledge base and Large Language Models (LLMs).
 
-**Initial implementation:** UiPath automation logs and incident knowledge.
+**Initial implementation:** Integration with UiPath automation logs and incident knowledge.
+The architecture is designed to support additional enterprise automation platforms through patform-specific connectors.
 
 **Long-term vision:** A platform-independent AI-assisted incident diagnosis framework for enterprise automation systems, supporting platforms such as UiPath, Automation Anywhere, Microsoft Power Automate, Blue Prism, and future automation technologies.
 
