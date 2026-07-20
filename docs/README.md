@@ -1,27 +1,29 @@
 # Documentation
 
-This folder contains the design and technical documentation for the Intelligent RPA RCA project.
+This folder contains the design and technical documentation for the **Intelligent Automation RCA** project.
+
 ---
 
-## Contains
+# Contents
 
-### Project Architecture
+## Project Architecture
 
-Describes the overall system architecture, major componenets, and data flow
+Describes the overall system architecture, major components, and data flow.
 
-### AI Diagnosis Pipeline
+## AI Diagnosis Pipeline
 
-Explains how execution logs move through parsing, classification, knowledge retrieval, LLM reasoning, and RCA generation.
+Explains how automation execution logs move through parsing, classification, knowledge retrieval, LLM reasoning, and RCA generation.
 
-### RCA Report Template
+## RCA Report Template
 
-Defines the standard format of the generated Root Cause Analysis Report.
+Defines the standard structure of the generated Root Cause Analysis (RCA) report.
 
-### Research Existing Solutions
+## Research Existing Solutions
 
-Compares current enterprise RPA solutions and identifies the research gap addressed by this project.
+Compares current enterprise automation platforms and identifies the research gap addressed by this project.
+
 ---
 
-## Purpose
+# Purpose
 
 The documentation in this folder provides the architectural foundation of the project and serves as a reference throughout development.
