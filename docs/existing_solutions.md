@@ -118,6 +118,6 @@ The proposed **Intelligent Automation RCA** platform addresses this gap through 
 
 Instead of relying solely on generative AI, the platform combines deterministic knowledge retrieval with LLM reasoning to produce transparent, explainable, and standardized Root Cause Analysis (RCA) reports.
 
-The architecture is designed to remain platform-independent while initially supporting UiPath automation logs and incident knowledge.
+The architecture is designed around platform-specific connectors that ingest execution data from enterprise automation platforms. The initial implementation targets UiPath, while the core AI diagnosis engine remains platform-independent.
 
 Future work aims to extend support to additional enterprise automation platforms, making the framework broadly applicable across modern Intelligent Automation ecosystems.
