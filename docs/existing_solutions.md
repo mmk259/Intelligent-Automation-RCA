@@ -144,4 +144,12 @@ Microsoft Power Automate enables workflow automation across Microsoft services a
 
 Existing enterprise RPA platforms have significantly improved automation resilience through retry mechanisms, monitoring dashboards, AI assistants, and self-healing capabilities. However, these solutions primarily focus on preventing or automatically recovering from failures rather than providing structured incident diagnosis.
 
-Most commercial platforms do not maintain a reusable knowledge base containing standardized incident taxonomies, historical incidents, probable root causes, and recovery strategies. Furthermore,
+Most commercial platforms do not maintain a reusable knowledge base containing standardized incident taxonomies, historical incidents, probable root causes, and recovery strategies. Furthermore, professional engineering-style Root cause Analysis (RCA) reports are generally not generated automatically.
+
+The proposed **Intelligent RPA RCA** platform addresses this gap by combining a structured knowledge base with deterministic retrieval and Large Language Model (LLM) reasoning. Instead of relying solely on generative AI, the system retrieves validated incident knowledge before generating explainable RCA reports, recovery recommendations, and prevention strategies. This hybrid approach improves transparency, consistency, and maintainability while supporting enterprise RPA developers in diagnosing production automation failures.
+
+---
+
+# Position of Proposed System
+
+The intelligent RPA RCA platform is not intended to replace existing RPA platforms or self-healing mechanisms. Instead, it complements them by providing an AI-assisted incident diagnosis layer that focuses on understanding failures, explaining their causes, recommending appropriate recovery actions, and producing professional RCA documenttation. The platform is designed to assist RPA developers and support teams in reducing troubleshooting effort while improving the quality and consistency of incident analysis.
