@@ -1,155 +1,123 @@
-# Related Work and Commercial Solutions
+# Related Work and Existing Solutions
 
-## Purpose
+## Introduction
 
-Before proposing a new solution, it is important to understand the capabilities and limitations of existing enterprise RPA platforms and AI-assisted automation tools. This document reviews current commercial solutions and identifies the research gap that motivates the Intelligent RPA RCA platform.
+Enterprise automation has evolved from rule-based Robotic Process Automation (RPA) toward Intelligent Automation, where artificial intelligence assists in automation development, monitoring, exception handling, and decision support. As automation adoption has increased across industries, organizations have faced growing challenges in diagnosing automation failures efficiently while maintaining service reliability.
 
----
-
-# 1. UiPath Healing Agent (Self-Healing)
-
-## Purpose
-
-UiPath Healing Agent is designed to automatically detect, diagnose, and recover from common automation failures during runtime. It can recommend recovery actions or automatically perform self-healing depending on configuration.
-
-## Strengths
-
-- AI-assisted runtime recovery
-- Automatic retry mechanisms
-- Selector healing capabilities
-- Integration with UiPath Studio and Orchestrator
-- Reduces manual intervention for common failures
-
-## Limitations
-
-- Primarily focuses on runtime recovery rather than comprehensive incident diagnosis.
-- Does not maintain a structured enterprise incident knowledge base.
-- Limited explainability of the reasoning behind recovery decisions.
-- Does not automatically generate professional Root Cause Analysis (RCA) reports.
+Recent research has explored AI-driven approaches for software log analysis, anomaly detection, fault diagnosis, and root cause analysis. At the same time, commercial enterprise automation platforms have introduced AI-powered assistants, monitoring systems, and self-healing capabilities. However, existing solutions primarily focus on workflow execution, recovery, or developer assistance rather than providing a unified AI-assisted incident diagnosis framework.
 
 ---
 
-# 2. UiPath Autopilot
+# Academic Research
 
-## Purpose
+## AI for Log Analysis
 
-UiPath Autopilot is an AI-powered assistant that helps developers build, modify, and troubleshoot automations using natural language.
+Modern software systems generate large volumes of execution logs that contain valuable diagnostic information. Numerous studies have investigated machine learning and deep learning techniques for automated log parsing, anomaly detection, and failure prediction.
 
-## Strengths
-
-- Assists automation development
-- Generates workflows from prompts
-- Explains automation components
-- Improves developer productivity
-- Integrated within the UiPath ecosystem
-
-## Limitations
-
-- General-purpose AI assistant rather than a dedicated incident diagnosis platform.
-- Does not maintain historical incident knowledge.
-- Does not generate standardized engineering RCA reports.
-- Focuses primarily on development assistance instead of production incident analysis.
+Recent work has also explored Large Language Models (LLMs) for software maintenance tasks such as log interpretation, debugging assistance, and incident summarization. These approaches demonstrate strong natural language reasoning capabilities but often lack structured domain knowledge, making them susceptible to hallucinations or inconsistent explanations when used independently.
 
 ---
 
-# 3. UiPath Built-in Resilience Features
+## Root Cause Analysis
 
-Examples include:
+Root Cause Analysis (RCA) has traditionally relied on manual investigation supported by domain experts.
 
+Research has proposed various approaches including:
+
+- Rule-based diagnosis
+- Knowledge graphs
+- Bayesian networks
+- Machine learning classifiers
+- Graph-based dependency analysis
+- LLM-assisted reasoning
+
+While these methods improve diagnosis accuracy, many require extensive historical datasets, handcrafted rules, or complex infrastructure.
+
+---
+
+## Knowledge-Augmented AI
+
+Recent research increasingly combines structured knowledge with generative AI.
+
+Rather than relying solely on LLM reasoning, these hybrid systems retrieve validated information from knowledge bases before generating responses. Retrieval-Augmented Generation (RAG) has become one of the most promising approaches for improving factual consistency and reducing hallucinations.
+
+This design philosophy directly motivates the architecture of the proposed system.
+
+---
+
+# Commercial Enterprise Automation Platforms
+
+## UiPath
+
+UiPath provides several AI-assisted capabilities including:
+
+- Healing Agent
+- Autopilot
 - Retry Scope
 - Check App State
 - Element Exists
-- Timeout Configuration
+- AI Center
 
-## Purpose
+These tools improve automation resilience, developer productivity, and runtime recovery.
 
-These activities improve workflow robustness by preventing common automation failures before they occur.
-
-## Strengths
-
-- Simple to implement
-- Built directly into UiPath Studio
-- Improves automation reliability
-- Handles temporary application failures effectively
-
-## Limitations
-
-- Preventive rather than diagnostic.
-- Cannot determine the underlying root cause of failures.
-- Does not provide historical incident analysis.
-- No automated RCA generation.
+However, public documentation primarily emphasizes automation execution and self-healing rather than structured incident diagnosis supported by reusable organizational knowledge.
 
 ---
 
-# 4. Automation Anywhere
+## Automation Anywhere
 
-## Purpose
+Automation Anywhere offers enterprise automation together with AI-powered automation, orchestration, analytics, and monitoring.
 
-Automation Anywhere is an enterprise RPA platform providing bot orchestration, monitoring, exception handling, and AI-powered automation capabilities.
-
-## Strengths
-
-- Enterprise-grade bot management
-- Monitoring dashboards
-- Exception handling
-- Analytics and reporting
-- AI integration capabilities
-
-## Limitations
-
-- Focuses primarily on automation execution and monitoring.
-- Limited AI-assisted root cause reasoning.
-- Does not maintain a structured knowledge base for incident diagnosis.
-- RCA generation is largely manual.
+Its platform provides extensive operational visibility but does not publicly describe a dedicated AI-assisted RCA workflow combining historical incident knowledge, taxonomy-driven classification, and standardized RCA generation.
 
 ---
 
-# 5. Microsoft Power Automate
+## Microsoft Power Automate
 
-## Purpose
+Microsoft Power Automate integrates workflow automation with monitoring, cloud execution, and AI Builder.
 
-Microsoft Power Automate enables workflow automation across Microsoft services and third-party applications.
-
-## Strengths
-
-- Cloud-based automation
-- Run history and monitoring
-- Error notifications
-- Integration with Microsoft ecosystem
-- AI Builder capabilities
-
-## Limitations
-
-- Primarily provides execution history rather than intelligent diagnosis.
-- Root cause investigation remains largely manual.
-- Does not generate engineering-style RCA reports.
-- Limited structured reasoning over historical incidents.
+The platform provides execution history and operational diagnostics but largely relies on users to investigate failures manually.
 
 ---
 
-# Comparative Summary
+## Enterprise Monitoring Platforms
 
-| Solution | Incident Diagnosis | Self-Healing | Knowledge Base | RCA Report Generation |
-|----------|--------------------|--------------|----------------|-----------------------|
-| UiPath Healing Agent | Partial | Yes | No | No |
-| UiPath Autopilot | Partial | No | No | No |
-| UiPath Built-in Activities | No | Partial | No | No |
-| Automation Anywhere | Partial | Partial | No | No |
-| Microsoft Power Automate | Partial | Partial | No | No |
-| Proposed Intelligent RPA RCA | Yes | Future Work | Yes | Yes |
+Enterprise observability platforms such as Splunk, Dynatrace, Datadog, and Elastic provide powerful log aggregation, anomaly detection, and monitoring capabilities.
+
+These platforms excel at identifying abnormal system behavior but are generally not designed specifically for enterprise automation incident diagnosis or automation-specific RCA generation.
 
 ---
 
 # Research Gap
 
-Existing enterprise RPA platforms have significantly improved automation resilience through retry mechanisms, monitoring dashboards, AI assistants, and self-healing capabilities. However, these solutions primarily focus on preventing or automatically recovering from failures rather than providing structured incident diagnosis.
+The literature and commercial platforms demonstrate significant progress in:
 
-Most commercial platforms do not maintain a reusable knowledge base containing standardized incident taxonomies, historical incidents, probable root causes, and recovery strategies. Furthermore, professional engineering-style Root cause Analysis (RCA) reports are generally not generated automatically.
+- Automation monitoring
+- Anomaly detection
+- Self-healing
+- AI-assisted development
+- Software log analysis
 
-The proposed **Intelligent RPA RCA** platform addresses this gap by combining a structured knowledge base with deterministic retrieval and Large Language Model (LLM) reasoning. Instead of relying solely on generative AI, the system retrieves validated incident knowledge before generating explainable RCA reports, recovery recommendations, and prevention strategies. This hybrid approach improves transparency, consistency, and maintainability while supporting enterprise RPA developers in diagnosing production automation failures.
+Nevertheless, a gap remains between **detecting** an automation failure and **explaining** it in a structured, reusable, engineering-oriented manner.
+
+Specifically, existing approaches rarely integrate:
+
+- Structured incident taxonomies
+- Historical incident knowledge
+- Validated recovery strategies
+- Deterministic knowledge retrieval
+- Large Language Model (LLM) reasoning
+
+within a single architecture dedicated to enterprise automation incident diagnosis.
 
 ---
 
-# Position of Proposed System
+# Motivation for Intelligent Automation RCA
 
-The intelligent RPA RCA platform is not intended to replace existing RPA platforms or self-healing mechanisms. Instead, it complements them by providing an AI-assisted incident diagnosis layer that focuses on understanding failures, explaining their causes, recommending appropriate recovery actions, and producing professional RCA documenttation. The platform is designed to assist RPA developers and support teams in reducing troubleshooting effort while improving the quality and consistency of incident analysis.
+The proposed **Intelligent Automation RCA** platform addresses this gap through a hybrid AI architecture.
+
+Instead of relying solely on generative AI, the platform combines deterministic knowledge retrieval with LLM reasoning to produce transparent, explainable, and standardized Root Cause Analysis (RCA) reports.
+
+The architecture is designed to remain platform-independent while initially supporting UiPath automation logs and incident knowledge.
+
+Future work aims to extend support to additional enterprise automation platforms, making the framework broadly applicable across modern Intelligent Automation ecosystems.
