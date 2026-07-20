@@ -10,12 +10,12 @@ The AI Diagnosis Pipeline transforms raw UiPath execution logs into a structured
 
 
 UiPath Execution Log
-----
+
         │
         ▼
 Log Parser
 (Extract Exception, Workflow, Activity, Timestamp)
-----
+
         │
         ▼
 Incident Classification
@@ -25,25 +25,31 @@ Incident Classification
         ▼
 Incident Identified
 (UI-003)
+
         │
         ▼
 Retrieve Incident Taxonomy
 (Category, Subcategory)
+
         │
         ▼
 Retrieve Possible Root Causes
 (Root Cause Library)
+
         │
         ▼
 Retrieve Recovery Actions
 (Recovery Library)
+
         │
         ▼
 Build Structured Context
 (Exception + Incident + Root Causes + Recovery + Execution Context)
+
         │
         ▼
 LLM Reasoning Engine
+
         │
         ▼
 Generate Professional RCA Report
