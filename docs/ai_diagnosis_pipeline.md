@@ -20,6 +20,7 @@ Log Parser
         ▼
 Incident Classification
 (Search Incident Catalog)
+
         │
         ▼
 Incident Identified
