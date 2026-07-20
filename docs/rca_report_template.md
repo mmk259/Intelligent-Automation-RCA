@@ -4,20 +4,21 @@
 
 - Incident ID
 - Timestamp
+- Automation Platform
 - Process Name
-- Robot Name
+- Automation Agent / Robot
 - Workflow Name
 - Failed Activity
 - Exception
-- Category
-- Subcategory
+- Incident Category
+- Incident Subcategory
 - Severity
 
 ---
 
 ## 2. Incident Description
 
-A brief explanation of the failure.
+A concise summary describing the automation failure and its observed impact.
 
 ---
 
@@ -26,20 +27,22 @@ A brief explanation of the failure.
 - Workflow
 - Parent Workflow
 - Activity
-- Sequence/Flowchart
+- Sequence / Flowchart
 - Inside Loop? (Yes/No)
-- Inside If/Switch? (Yes/No)
+- Inside Conditional Branch? (Yes/No)
 - Application
-- Screen/Page
+- Screen / Page
 - URL (if applicable)
 
 ---
 
-## 4. Log Context
+## 4. Execution Context
 
 - Previous Log Entries
 - Failed Log Entry
-- Next Log Entry (if available)
+- Subsequent Log Entry (if available)
+- Relevant Input Parameters
+- Environment Information (if available)
 
 ---
 
@@ -47,31 +50,33 @@ A brief explanation of the failure.
 
 - Similar Incident IDs
 - Previous Resolution
-- Number of Occurrences
+- Number of Previous Occurrences
 
 ---
 
-## 6. Possible Root Causes
+## 6. Probable Root Causes
 
-Ranked list of probable causes with confidence.
+Ranked list of the most probable root causes with confidence scores.
 
 ---
 
 ## 7. Supporting Evidence
 
-Evidence extracted from logs and execution context.
+Evidence retrieved from execution logs, incident history, and runtime context supporting the diagnosis.
 
 ---
 
 ## 8. Recommended Recovery Actions
 
-Ordered list of recovery actions.
+Ordered list of recommended recovery actions based on retrieved knowledge and AI reasoning.
 
 ---
 
-## 9. Suggested UiPath Activities
+## 9. Platform-Specific Recommendations *(Optional)*
 
-Example:
+When applicable, recommend automation-platform-specific solutions.
+
+**Example (UiPath):**
 
 - Retry Scope
 - Check App State
@@ -79,26 +84,28 @@ Example:
 - Use Application/Browser
 - Wait for Ready
 
+Future implementations may include recommendations for other enterprise automation platforms.
+
 ---
 
 ## 10. Estimated Recovery Time
 
-Estimated effort required to resolve the issue.
+Estimated effort required to resolve the incident.
 
 ---
 
 ## 11. Prevention Recommendations
 
-Suggestions to reduce recurrence.
+Recommendations to reduce the likelihood of similar incidents occurring in the future.
 
 ---
 
 ## 12. References
 
-Relevant documentation links.
+Relevant documentation, knowledge-base articles, historical incidents, or vendor documentation referenced during diagnosis.
 
 ---
 
 ## 13. Confidence Score
 
-Overall confidence of the diagnosis.
+Overall confidence score of the generated diagnosis and recommendations.
