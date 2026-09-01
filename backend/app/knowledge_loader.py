@@ -10,10 +10,11 @@ KB_DIR = BASE_DIR / "knowledge_base"
 
 def load_knowledge_base():
     """
-    Loads the Intelligent RPA RCA knowledge base.
+    Loads the Intelligent Automation RCA knowledge base.
 
     Returns:
-        dict: Loaded knowledge base tables.
+        dict: Knowledge base tables used for incident classification,
+        root cause retrieval, and recovery recommendation.
     """
 
     if not KB_DIR.exists():
