@@ -1,4 +1,4 @@
-from knowledge_loader import load_knowledge_base
+from app.knowledge_loader import load_knowledge_base
 
 
 def classify_incident(incident):
