@@ -1,0 +1,211 @@
+{
+  "experiment": {
+    "name": "Iterative RCA Verification",
+    "description": "Evaluation of an iterative LLM verification and revision loop against the single-pass RCA generation baseline.",
+    "model": "gpt-oss:20b-cloud",
+    "verification_method": "LLM-based verification followed by LLM-based revision",
+    "shared_generation_method": "Existing generate_rca()",
+    "test_case_count": 6,
+    "test_cases": [
+      "Missing File",
+      "UI Selector",
+      "Network Path",
+      "Terminal Session",
+      "Timeout",
+      "Unknown Incident"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "missing_file",
+      "incident_name": "Missing File",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "NEEDS_REVISION",
+        "unsupported_claims": "The initial RCA included an unsupported claim describing the runtime environment as cloud-based, although the incident data did not provide runtime information.",
+        "invented_evidence": "None identified.",
+        "evidence_classification_problems": "None identified.",
+        "root_cause_problems": "None identified. The retrieved root cause remained an unverified hypothesis as required.",
+        "recovery_action_problems": "None identified.",
+        "confidence_problems": "None identified.",
+        "prevention_recommendation_problems": "None identified.",
+        "required_revisions": "Remove or qualify the unsupported runtime-environment claim and clarify that the actual configured file path was not provided and therefore could not be directly verified."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": true,
+        "substantive_improvement": true,
+        "notes": "The revised RCA removed the unsupported cloud-runtime claim and explicitly clarified that the file path was unavailable for direct verification. This is a clear example of the verification loop improving RCA grounding."
+      }
+    },
+
+    {
+      "case_id": "ui_selector",
+      "incident_name": "UI Selector",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "PASS",
+        "unsupported_claims": "None identified by the verifier.",
+        "invented_evidence": "None identified.",
+        "evidence_classification_problems": "None identified.",
+        "root_cause_problems": "None identified.",
+        "recovery_action_problems": "None identified.",
+        "confidence_problems": "None identified.",
+        "prevention_recommendation_problems": "None identified.",
+        "required_revisions": "None."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": false,
+        "substantive_improvement": false,
+        "notes": "The initial RCA contained unsupported or generalized claims, including statements about recent UI changes, screenshot comparison, and interpretation of the short execution duration. The verifier returned PASS and did not identify these issues. The revised RCA therefore did not provide a demonstrated grounding improvement. This represents a verifier false negative."
+      }
+    },
+
+    {
+      "case_id": "network_path",
+      "incident_name": "Network Path",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "PASS",
+        "unsupported_claims": "None identified by the verifier.",
+        "invented_evidence": "None identified.",
+        "evidence_classification_problems": "None identified.",
+        "root_cause_problems": "None identified by the verifier.",
+        "recovery_action_problems": "None identified.",
+        "confidence_problems": "None identified.",
+        "prevention_recommendation_problems": "None identified.",
+        "required_revisions": "None."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": false,
+        "substantive_improvement": false,
+        "notes": "The initial RCA contained unsupported interpretations, including reasoning from the absence of other diagnostics and an unsupported timezone-qualified timestamp. The verifier returned PASS and did not identify these issues. The revised RCA therefore does not demonstrate a reliable verification-driven grounding improvement."
+      }
+    },
+
+    {
+      "case_id": "terminal_session",
+      "incident_name": "Terminal Session",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "PASS",
+        "unsupported_claims": "None identified by the verifier.",
+        "invented_evidence": "None identified.",
+        "evidence_classification_problems": "None identified.",
+        "root_cause_problems": "None identified.",
+        "recovery_action_problems": "None identified.",
+        "confidence_problems": "None identified.",
+        "prevention_recommendation_problems": "None identified.",
+        "required_revisions": "None."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": false,
+        "substantive_improvement": false,
+        "notes": "The initial RCA contained a timezone-qualified timestamp even though the incident did not specify a timezone. The revised RCA removed this detail, making the output cleaner, but the verifier did not identify the issue. Therefore, the change cannot be attributed confidently to successful verification."
+      }
+    },
+
+    {
+      "case_id": "timeout",
+      "incident_name": "Timeout",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "NEEDS_REVISION",
+        "unsupported_claims": "The initial RCA interpreted the observed five-minute execution duration as evidence that the configured timeout had been exceeded, although the configured timeout value was not provided.",
+        "invented_evidence": "None identified.",
+        "evidence_classification_problems": "None identified.",
+        "root_cause_problems": "None identified. The retrieved slow-application-response cause remained appropriately uncertain.",
+        "recovery_action_problems": "None identified.",
+        "confidence_problems": "None identified.",
+        "prevention_recommendation_problems": "None identified.",
+        "required_revisions": "Describe the five-minute period only as the observed execution duration and do not infer the configured timeout value."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": true,
+        "substantive_improvement": true,
+        "notes": "The revised RCA correctly described the five-minute period as an observed execution duration rather than evidence of a configured timeout. This is a clear successful verification and revision."
+      }
+    },
+
+    {
+      "case_id": "unknown_incident",
+      "incident_name": "Unknown Incident",
+
+      "incident": {},
+      "classification": {},
+      "root_causes": [],
+      "recovery_actions": [],
+
+      "initial_rca": "",
+
+      "verification": {
+        "result": "PASS",
+        "unsupported_claims": "The verifier itself identified unsupported claims concerning activity sequencing, possible package-version incompatibility, and possible .NET runtime or robot-environment problems.",
+        "invented_evidence": "No direct invented incident evidence was identified, but the RCA introduced unsupported domain hypotheses despite the absence of retrieved knowledge.",
+        "evidence_classification_problems": "The generated hypotheses were not supported by observed evidence or retrieved knowledge and should not have been presented as diagnostic possibilities under the system's grounding constraints.",
+        "root_cause_problems": "The initial RCA proposed multiple root causes despite having no classification, root-cause retrieval results, or recovery actions. These included missing or invalid input, activity-state mismatch, package incompatibility, and runtime/environment issues.",
+        "recovery_action_problems": "No retrieved recovery actions were available, so the system should have avoided introducing unsupported recovery guidance.",
+        "confidence_problems": "The RCA should have explicitly treated the incident as undetermined because insufficient evidence was available.",
+        "prevention_recommendation_problems": "Prevention recommendations were not sufficiently grounded in the supplied incident or knowledge base.",
+        "required_revisions": "The RCA should abstain from proposing unsupported root causes and should explicitly state that the root cause is undetermined due to insufficient evidence."
+      },
+
+      "revised_rca": "",
+
+      "evaluation": {
+        "verification_correctly_identified_problem": false,
+        "substantive_improvement": false,
+        "notes": "This is the most significant verifier failure. The verifier identified several unsupported claims in its own analysis but nevertheless returned PASS and required no revisions. The revised RCA preserved unsupported root-cause hypotheses instead of abstaining. This demonstrates that the verification loop does not reliably enforce unknown-incident abstention and contains an internal inconsistency between its findings and overall assessment."
+      }
+    }
+  ]
+}

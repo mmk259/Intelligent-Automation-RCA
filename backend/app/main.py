@@ -6,10 +6,8 @@ from app.retriever import retrieve_root_causes
 from app.recovery_engine import retrieve_recovery_actions
 from app.llm_integration import generate_rca
 from app.rca_generator import generate_rca_report
-from app.semantic_rag import (
-    retrieve_semantic_root_causes,
-    retrieve_semantic_recovery_actions
-)
+from app.semantic_rag import (retrieve_semantic_root_causes,retrieve_semantic_recovery_actions)
+from app.rca_verification import generate_verified_rca
 
 app = FastAPI(
     title="Intelligent Automation RCA",
@@ -82,3 +80,44 @@ def analyze_semantic(request: AnalyzeRequest):
         "root_causes": semantic_root_causes,
         "recovery_actions": semantic_recovery_actions
     }
+
+@app.post("/analyze/verified")
+def analyze_verified(request: AnalyzeRequest):
+    try:
+        incident = parse_uipath_log(request.log)
+        classification = classify_incident(incident)
+
+        root_causes = retrieve_root_causes(classification)
+        recovery_actions = retrieve_recovery_actions(classification)
+
+        # Generate the initial RCA using the exact same baseline LLM function.
+        generated_rca = generate_rca(
+            incident,
+            classification,
+            root_causes,
+            recovery_actions
+        )
+
+        # Verify and revise the baseline-generated RCA.
+        verified_result = generate_verified_rca(
+            incident,
+            classification,
+            root_causes,
+            recovery_actions,
+            generated_rca
+        )
+
+        # Keep the initial RCA, verification findings, and revised RCA
+        # separately so the experiment can compare them.
+        return {
+            "incident": incident,
+            "classification": classification,
+            "root_causes": root_causes,
+            "recovery_actions": recovery_actions,
+            "initial_rca": verified_result["initial_rca"],
+            "verification_result": verified_result["verification_result"],
+            "revised_rca": verified_result["revised_rca"]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
