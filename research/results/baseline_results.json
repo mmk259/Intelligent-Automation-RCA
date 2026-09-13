@@ -1,0 +1,414 @@
+{
+  "experiment": "Baseline Evaluation",
+  "experiment_date": "2026-09-05",
+  "system_configuration": {
+    "classification": "Structured incident classification",
+    "root_cause_retrieval": "Structured retrieval",
+    "recovery_retrieval": "Structured retrieval",
+    "llm": "gpt-oss:20b-cloud",
+    "embedding_model": null
+  },
+  "test_cases": [
+    {
+      "case_id": "BASE-001",
+      "name": "Missing File",
+      "input_type": "known_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Invoice_Processing",
+        "package": "UiPath.Excel.Activities",
+        "package_version": "2.24.2",
+        "exception": {
+          "message": "Workbook does not exist",
+          "type": "System.IO.FileNotFoundException"
+        },
+        "workflow": "Invoice_Processing.xaml",
+        "activity": "Read Invoice Workbook",
+        "timestamp": {
+          "start": "2026-09-05T10:15:22",
+          "end": "2026-09-05T10:15:24"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "Invoice_2026_09.xlsx",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": "FILE-001",
+        "category_id": "FILE",
+        "subcategory": "Missing File",
+        "description": "Workbook file could not be found.",
+        "confidence": 0.8
+      },
+      "root_causes": [
+        {
+          "root_cause_id": "RCA-006",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "possible_root_cause": "Incorrect file path",
+          "confidence": "High",
+          "verification_method": "Validate configured path"
+        }
+      ],
+      "recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "suggested_recovery": "Verify that the configured file path exists before execution.",
+          "automation_level": "Manual",
+          "notes": "User may need to provide the correct file."
+        }
+      ],
+      "generated_rca": "1. Incident Summary\nOn 2026-09-05, the UiPath robot TestRobot running on TEST-MACHINE executed the Invoice_Processing workflow. During the Read Invoice Workbook activity the process faulted with a System.IO.FileNotFoundException (Workbook does not exist). The robot was supplied with the input filename Invoice_2026_09.xlsx and reported no output values.\n\n2. Failure Location\n- Platform: UiPath\n- Workflow: Invoice_Processing.xaml\n- Activity: Read Invoice Workbook\n- Package: UiPath.Excel.Activities (v2.24.2)\n- Timestamp: 2026-09-05 10:15:22 – 10:15:24\n\n3. Probable Root Cause\nPossible Root Cause: Incorrect file path\n- Plausibility: The exception indicates a file-not-found error, and the only file reference in the incident record is the bare filename (Invoice_2026_09.xlsx). No absolute or fully qualified path is present, making a mis-configured path a natural explanation.\n- Verification Method: “Validate configured path” – check the workflow variable or configuration that supplies the file path, verify that the path points to an existing workbook on the machine or shared location, and test with a file-existence check before the Read activity.\n- Verification Status: Not yet performed. No evidence in the incident record shows that the path was validated or that the file existed at the specified location.\n\nOther potential causes (e.g., the file simply being absent from the expected directory) are not supported by the current evidence and remain speculative.\n\n4. Supporting Evidence\n\n| Category | Details |\n|----------|---------|\n| Observed Evidence | • Exception: System.IO.FileNotFoundException – “Workbook does not exist”<br>• Input value: Invoice_2026_09.xlsx<br>• Activity: Read Invoice Workbook<br>• Timestamp: 2026-09-05T10:15:22 – 2026-09-05T10:15:24<br>• Robot & machine: TestRobot on TEST-MACHINE<br>• Workflow: Invoice_Processing.xaml |\n| Retrieved Knowledge | • Root-cause candidate: “Incorrect file path” (Category: FILE, Sub-category: Missing File, Confidence: High)<br>• Recommendation: Verify that the configured file path exists before execution (Manual). |\n| Model Inference | The mismatch between the bare filename and the “Workbook does not exist” error suggests that the configured path may be wrong or incomplete. This inference is not confirmed evidence but a logical deduction based on the available data. |\n\n5. Recommended Recovery Actions\n- Recovery ID: REC-004\n- Category/Sub-category: FILE / Missing File\n- Suggested Recovery: Verify that the configured file path exists before execution.\n- Automation Level: Manual\n- Notes: User may need to provide the correct file.\n\n6. Prevention Recommendations\n- Path Validation: Incorporate a pre-execution check (e.g., FileExists activity) to verify the presence of the input workbook; alert or halt the workflow if the file is missing.\n- Absolute Paths or Environment Variables: Store file locations in variables derived from environment variables or secure vaults to avoid hard-coding relative paths that can become invalid.\n- Logging and Alerts: When a file-not-found exception occurs, log the full attempted path and trigger an alert to the operator so the issue can be addressed promptly.\n- Continuous Configuration Review: Periodically audit configuration files or application settings that supply file paths to ensure they remain accurate across deployments and updates.\n- Error Handling Templates: Use UiPath’s exception handling patterns to gracefully handle missing files, such as retrying with an alternative path or falling back to a default workbook.\n\n7. Confidence\nRoot-cause confidence: Low – The evidence directly shows a file-not-found error, but the specific cause (incorrect path vs. file genuinely missing) has not been verified. The knowledge-base confidence label (“High”) reflects the general plausibility of path-misconfiguration, not the certainty that it caused this particular incident. Therefore, confidence in the identified root cause remains low.",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS",
+        "notes": [
+          "Root cause was explicitly presented as plausible and unverified.",
+          "The LLM distinguished knowledge-base confidence from incident-specific root-cause confidence."
+        ]
+      }
+    },
+    {
+      "case_id": "BASE-002",
+      "name": "UI Selector",
+      "input_type": "known_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Loan_Disbursal",
+        "package": "UiPath.UIAutomation.Activities",
+        "package_version": "23.10.6",
+        "exception": {
+          "message": "NodeNotFoundException",
+          "type": "NodeNotFoundException"
+        },
+        "workflow": "Loan_Disbursal.xaml",
+        "activity": "Click Submit",
+        "timestamp": {
+          "start": "2026-09-05T11:20:10",
+          "end": "2026-09-05T11:20:12"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "Submit Button",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": "UI-003",
+        "category_id": "UI",
+        "subcategory": "Selector",
+        "description": "Target UI node could not be located.",
+        "confidence": 1
+      },
+      "root_causes": [
+        {
+          "root_cause_id": "RCA-001",
+          "category_id": "UI",
+          "subcategory": "Selector",
+          "possible_root_cause": "Selector changed after UI update",
+          "confidence": "High",
+          "verification_method": "Compare selector with current UI"
+        },
+        {
+          "root_cause_id": "RCA-002",
+          "category_id": "UI",
+          "subcategory": "Selector",
+          "possible_root_cause": "Dynamic attributes in selector",
+          "confidence": "High",
+          "verification_method": "Inspect selector attributes"
+        }
+      ],
+      "recovery_actions": [
+        {
+          "recovery_id": "REC-001",
+          "category_id": "UI",
+          "subcategory": "Selector",
+          "suggested_recovery": "Validate selector using UI Explorer and update if required.",
+          "automation_level": "Semi-Automatic",
+          "notes": "Human verification recommended."
+        }
+      ],
+      "generated_rca": "RCA Report – AUTOMATION INCIDENT\n\n| Section | Content |\n|---------|---------|\n\n---\n\n### 1. Incident Summary\n- Platform: UiPath\n- Workflow: Loan_Disbursal.xaml\n- Activity: Click Submit\n- Exception: NodeNotFoundException (message: “Target UI node could not be located.”)\n- Time: 2026-09-05 11:20:10 – 11:20:12\n- Robot & Machine: TestRobot, TEST-MACHINE\n- Input Values: “Submit Button” (the button the activity was supposed to click)\n- Output Values: None – the click never executed.\n- Context: No UI recording was attached (has_recording: False).\n\nThe activity failed because UiPath could not locate the UI element identified by the selector for the “Submit” button.\n\n---\n\n### 2. Failure Location\n- Activity Type: UiPath.UIAutomation.Activities (Click) in Loan_Disbursal.xaml\n- Selector Target: UI node representing the “Submit” button.\n\n---\n\n### 3. Probable Root Cause\n| Suspected Root Cause | Why It Is Plausible | Verification Method | Verification Status |\n|----------------------|---------------------|---------------------|---------------------|\n| Selector changed after UI update | The exception indicates that the selector cannot find the node. A common reason for this is that the UI changed (e.g., new layout, control ID alteration) after the selector was captured. | Compare the stored selector string with the current UI element (via UiPath Studio > UI Explorer). | Not performed |\n| Dynamic attributes in selector | If the selector uses attributes that can vary at runtime (e.g., dynamic IDs, indexes), the same UI can render multiple instances, causing a mismatch. The rarity of the exception and lack of a recording suggest that an existing dynamic attribute may have caused the node to be unrecognizable. | Inspect the selector for transient attributes (e.g., id, index) and test against the live UI. | Not performed |\n\n> Root-cause confidence – Medium: Evidence clearly shows a node-lookup failure, but neither of the above causes has been confirmed through inspection or comparison. Additional verification is required to rule one out definitively.\n\n---\n\n### 4. Supporting Evidence\n\n| Category | Source | Details |\n|----------|--------|---------|\n| Observed Evidence | Incident data | ① NodeNotFoundException during Click Submit. ② Timestamp: 2026-09-05T11:20:10–11:20:12. ③ Robot: TestRobot. ④ Machine: TEST-MACHINE. ⑤ Input: “Submit Button”. ⑥ has_recording: False. |\n| Retrieved Knowledge | Root-cause database | ① Selector changed after UI update (High confidence). <br>② Dynamic attributes in selector (High confidence). |\n| Model Inference | Reasoned deduction | ① A selector that fails to locate the node often indicates a UI change or non-stable attribute. ② Absence of a UI recording suggests that automated UI validation was not previously performed. |\n\n> Note: Only the incident’s log entries are true observations. The knowledge base entries provide possible explanations, and model inference draws connections between them.\n\n---\n\n### 5. Recommended Recovery Actions\n| Recovery ID | Category | Subcategory | Suggested Recovery | Automation Level | Notes |\n|-------------|----------|------------|-------------------|------------------|-------|\n| REC-001 | UI | Selector | Validate selector using UI Explorer and update if required. | Semi-Automatic | Human verification recommended. |\n\n> Do not invent any additional recovery actions. Use exactly the action listed above.\n\n---\n\n### 6. Prevention Recommendations\n\n1. Use Robust Selector Strategies\n - Adopt attributes that remain stable across UI updates (e.g., automationId over id or index).\n - Validate selector resilience in the development environment before deployment.\n\n2. Automated Selector Validation Pipeline\n - Integrate a periodic run that opens the UI and confirms that each selector still resolves to the intended element.\n\n3. Maintain UI Recordings\n - Store recordings or snapshots of UI states for key activities, enabling quick regression checks when UI changes are propagated.\n\n4. Version-Control UI Definitions\n - Tie UI changes to versioned source control commits so that selector updates can be traced back to specific UI revisions.\n\n5. Training & Guidelines\n - Provide developers with best-practice guidelines for selector creation and review logs that highlight node-not-found exceptions as early warnings.\n\nThese recommendations are derived from the incident context and the most likely root-cause hypotheses but are not evidence that a particular practice caused or prevented the failure.\n\n---\n\n### 7. Confidence\nIncident-Specific Confidence Level: Medium\n> The exception provides a clear symptom, but without inspecting the actual selector against the current UI, we cannot confirm whether the selector changed or contains dynamic attributes. Hence, the root-cause remains plausible but not decisively proven.",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS_WITH_OBSERVATION",
+        "notes": [
+          "The RCA correctly kept the suspected root causes unverified.",
+          "The model made an unsupported inference about the rarity of the exception.",
+          "The absence of a recording was used to infer that automated UI validation had not been performed, which was not directly established by the incident data."
+        ]
+      }
+    },
+    {
+      "case_id": "BASE-003",
+      "name": "Network Path",
+      "input_type": "known_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Customer_Onboarding",
+        "package": "UiPath.System.Activities",
+        "package_version": "24.10.3",
+        "exception": {
+          "message": "Network path not found",
+          "type": "System.IO.IOException"
+        },
+        "workflow": "Customer_Onboarding.xaml",
+        "activity": "Read Customer Document",
+        "timestamp": {
+          "start": "2026-09-05T12:05:14",
+          "end": "2026-09-05T12:05:17"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "\\\\TEST-SERVER\\CustomerDocs\\customer_001.pdf",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": "NET-001",
+        "category_id": "NET",
+        "subcategory": "Path",
+        "description": "Shared network location is unavailable.",
+        "confidence": 0.8
+      },
+      "root_causes": [
+        {
+          "root_cause_id": "RCA-010",
+          "category_id": "NET",
+          "subcategory": "Path",
+          "possible_root_cause": "Shared drive unavailable",
+          "confidence": "High",
+          "verification_method": "Verify network share"
+        }
+      ],
+      "recovery_actions": [
+        {
+          "recovery_id": "REC-008",
+          "category_id": "NET",
+          "subcategory": "Path",
+          "suggested_recovery": "Validate network share availability and permissions.",
+          "automation_level": "Manual",
+          "notes": "Network administrator may be required."
+        }
+      ],
+      "generated_rca": "RCA REPORT – NET-001\n\n| Section | Content |\n|---------|---------|\n| 1. Incident Summary | A UiPath automation named Customer_Onboarding halted during the Read Customer Document activity. The robot reported an IO error “Network path not found” while attempting to read the file \\\\TEST-SERVER\\CustomerDocs\\customer_001.pdf on machine TEST-MACHINE. The workflow failed after ~3 seconds. |\n| 2. Failure Location | Workflow: Customer_Onboarding.xaml – Activity: Read Customer Document (UiPath.System.Activities package v24.10.3). Failure triggered in the remote file-reading step, specifically the attempt to resolve the UNC share path. |\n| 3. Probable Root Cause | Shared drive unavailable – Possible Root Cause (RCA-010). <br><br>Why it is plausible:<br>• The exception type System.IO.IOException with message “Network path not found” is a classic symptom of a missing or unreachable UNC share.<br>• Input value shows the file exists on a network location \\\\TEST-SERVER\\CustomerDocs\\… which implies the robot expected the share to be reachable.<br>• No local file fallback or alternative path was defined, narrowing the fault to the network location. <br><br>Verification method: “Verify network share”. <br>Verification status: Not performed in this incident.<br>Root-cause confidence: Low (plausible but unverified). |\n| 4. Supporting Evidence | Observed Evidence | <br>• exception.message = \"Network path not found\" (IO error)<br>• exception.type = System.IO.IOException<br>• input_values = \"\\\\\\\\TEST-SERVER\\\\CustomerDocs\\\\customer_001.pdf\"<br>• process = \"Customer_Onboarding\"<br>• activity = \"Read Customer Document\"<br>• platform = UiPath, status = FAULTED<br>• timestamp.start = 2026-09-05T12:05:14, timestamp.end = 2026-09-05T12:05:17<br>• Robot / machine identifiers confirmed (TestRobot / TEST-MACHINE). | Retrieved Knowledge | <br>• Root cause from knowledge base: Shared drive unavailable (Category NET-Path, Confidence = High).<br>• Recovery action: Validate network share availability and permissions (Manual). | Model Inference | <br>• The exception message matches the signature of a missing UNC share.<br>• The path indicates a centralized network location; if this were a local file or an alternative share, the error would differ. |\n| 5. Recommended Recovery Actions | 1. Validate network share availability and permissions. <br>- Automation Level: Manual <br>- Notes: Network administrator may be required. <br> (Action from REC-008; no other actions were supplied.) |\n| 6. Prevention Recommendations | 1. Implement automated share health checks – schedule periodic pings or SMB/SMB-direct tests from the robot’s host to ensure the UNC path is reachable. <br>2. Configure redundant file-storage – set up a secondary network location or fail-over share so the robot can fall back when the primary is unavailable. <br>3. Centralize share permission audits – periodically verify that the robot’s service account retains browse and read permissions on the network share. <br>4. Add robust exception handling – instrument the workflow to catch IO exceptions and trigger a retry or alternate path, reducing single-point failure. |\n| 7. Confidence | Low – The root-cause remains plausible because the error message aligns with a shared-drive outage, but no verification (e.g., ping, file-system check) was executed to confirm the share’s unavailability. The incident report gives no indication that the drive was indeed offline, so the confidence in the identified root cause is limited. |\n\n---",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS_WITH_OBSERVATION",
+        "notes": [
+          "The RCA correctly identified the root cause as plausible and unverified.",
+          "The model claimed that no local file fallback or alternative path was defined, although this was not established by the incident data."
+        ]
+      }
+    },
+    {
+      "case_id": "BASE-004",
+      "name": "Terminal Session",
+      "input_type": "known_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Customer_Onboarding",
+        "package": "UiPath.Terminal.Activities",
+        "package_version": "2.4.0",
+        "exception": {
+          "message": "Terminal session not found",
+          "type": "UiPath.Terminal.SessionNotFoundException"
+        },
+        "workflow": "Customer_Onboarding.xaml",
+        "activity": "Read Customer Account",
+        "timestamp": {
+          "start": "2026-09-05T13:10:05",
+          "end": "2026-09-05T13:10:07"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "Customer Account Screen",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": "TERM-002",
+        "category_id": "TERM",
+        "subcategory": "Session",
+        "description": "Terminal session has expired or disconnected.",
+        "confidence": 0.8
+      },
+      "root_causes": [
+        {
+          "root_cause_id": "RCA-012",
+          "category_id": "TERM",
+          "subcategory": "Session",
+          "possible_root_cause": "Session expired",
+          "confidence": "High",
+          "verification_method": "Verify session status"
+        }
+      ],
+      "recovery_actions": [
+        {
+          "recovery_id": "REC-010",
+          "category_id": "TERM",
+          "subcategory": "Session",
+          "suggested_recovery": "Re-establish the terminal session automatically.",
+          "automation_level": "Automatic",
+          "notes": "Restart session if disconnected."
+        }
+      ],
+      "generated_rca": "1. Incident Summary\nOn 2026-09-05 at 13:10 UTC, the UiPath robot TestRobot executing the workflow Customer_Onboarding.xaml encountered a fault while running the activity Read Customer Account. The robot, running on machine TEST-MACHINE, raised a UiPath.Terminal.SessionNotFoundException with the message “Terminal session not found”. The process aborted with status FAULTED and no output values were produced.\n\n---\n\n2. Failure Location\n- Platform: UiPath\n- Process: Customer_Onboarding\n- Package: UiPath.Terminal.Activities v2.4.0\n- Activity: Read Customer Account\n- Timestamp: 2026-09-05T13:10:05 – 2026-09-05T13:10:07\n- Robot: TestRobot (Machine: TEST-MACHINE)\n\n---\n\n3. Probable Root Cause\n\n| Plausible Cause | Why It Is Plausible | Verification Method | Verification Status |\n|-----------------|---------------------|---------------------|---------------------|\n| Session expired (RCA-012) | The exception type SessionNotFoundException and message “Terminal session not found” directly indicate that UiPath could not locate an active terminal session when the activity attempted to read the customer account screen. The classification engine also tagged the incident as “Terminal session has expired or disconnected.” | Verify the state of the terminal session at the time of the failure (e.g., check session ID, status logs, or session timestamp). | Not yet performed – no session-status check was documented in the incident record. |\n\nNote: No other root causes are present in the retrieved knowledge base for this sub-category, and the evidence does not verify any additional possibilities. Therefore, “Session expired” remains a plausible but unconfirmed root cause.\n\n---\n\n4. Supporting Evidence\n\n| Category | Evidence |\n|----------|----------|\n| Observed Evidence | • Exception: UiPath.Terminal.SessionNotFoundException with message “Terminal session not found”. <br>• Fault status: FAULTED. <br>• Activity context: attempting to read “Customer Account Screen” on machine TEST-MACHINE at 13:10 UTC. |\n| Retrieved Knowledge | • Root-cause entry RCA-012: Session expired (confidence “High”) <br>• Classification description: “Terminal session has expired or disconnected.” |\n| Model Inference | The observed exception type and message strongly correlate with a missing or expired terminal session, matching the retrieved root-cause entry. However, without session-status logs, this remains an inference. |\n\n---\n\n5. Recommended Recovery Actions\n*(From the provided recovery plan – no additions)*\n\n| Recovery ID | Category | Sub-category | Suggested Recovery | Automation Level | Notes |\n|-------------|----------|--------------|--------------------|------------------|-------|\n| REC-010 | TERM | Session | Re-establish the terminal session automatically. | Automatic | Restart session if disconnected. |\n\n---\n\n6. Prevention Recommendations\n1. Implement session-status monitoring so that the robot can detect an imminent session expiry and proactively reconnect before a critical activity begins.\n2. Extend session time-outs or enable session keep-alive mechanisms on the terminal to reduce abrupt expirations during user-interacting workflows.\n3. Add a pre-activity check that verifies terminal session existence; if absent, trigger automatic re-establish before proceeding.\n4. Record session metadata (e.g., start time, last activity) during each execution to facilitate root-cause analysis when failures occur.\n\nThese recommendations are derived from the incident’s nature (missing terminal session) and the retrieved root-cause knowledge, not from direct observation within this specific event.\n\n---\n\n7. Confidence\n- Root-cause confidence: Medium – The evidence (exception type/message, classification) strongly suggests session expiry, yet the absence of a verified session-status check prevents definitive confirmation.\n- Overall incident confidence: Medium – The incident details and classification score provide a solid basis for understanding the failure, but limited evidence beyond the exception limits certainty about the exact cause.",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS_WITH_OBSERVATION",
+        "notes": [
+          "The RCA correctly kept session expiry plausible rather than confirmed.",
+          "The model introduced UTC even though the supplied timestamp had no timezone information."
+        ]
+      }
+    },
+    {
+      "case_id": "BASE-005",
+      "name": "Timeout",
+      "input_type": "known_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Payment_Processing",
+        "package": "UiPath.System.Activities",
+        "package_version": "24.10.3",
+        "exception": {
+          "message": "Operation timed out",
+          "type": "System.TimeoutException"
+        },
+        "workflow": "Payment_Processing.xaml",
+        "activity": "Submit Payment",
+        "timestamp": {
+          "start": "2026-09-05T14:30:00",
+          "end": "2026-09-05T14:35:00"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "Payment Transaction",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": "PERF-001",
+        "category_id": "PERF",
+        "subcategory": "Timeout",
+        "description": "Activity exceeded the configured timeout.",
+        "confidence": 0.8
+      },
+      "root_causes": [
+        {
+          "root_cause_id": "RCA-015",
+          "category_id": "PERF",
+          "subcategory": "Timeout",
+          "possible_root_cause": "Slow application response",
+          "confidence": "Medium",
+          "verification_method": "Review execution time"
+        }
+      ],
+      "recovery_actions": [
+        {
+          "recovery_id": "REC-014",
+          "category_id": "PERF",
+          "subcategory": "Timeout",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "automation_level": "Semi-Automatic",
+          "notes": "Monitor recurring timeout patterns."
+        }
+      ],
+      "generated_rca": "Incident Summary\nA UiPath robot (TestRobot) executing the Payment_Processing.xaml workflow failed during the Submit Payment activity. The process was marked FAULTED after a System.TimeoutException (“Operation timed out”) occurred between 14:30 and 14:35 on 2026-09-05. No output was produced and the incident was captured on the machine TEST-MACHINE with account test_account.\n\n---\n\nFailure Location\n- Platform: UiPath\n- Process: Payment_Processing\n- Workflow: Payment_Processing.xaml\n- Activity: Submit Payment\n- Exception: System.TimeoutException – “Operation timed out”\n\n---\n\nProbable Root Cause\n| Plausible Cause | Why it is plausible | Verification Method | Verification Status |\n|-----------------|---------------------|----------------------|---------------------|\n| Slow application response | The timeout exception directly indicates that the activity could not complete within the allotted time. A common cause of such timeouts in UiPath is an underlying application that is slow to respond to the UI interaction. | Review the execution time of the activity against the configured timeout value and compare it to historical performance of the target application. | Not yet performed |\n\nNote: This is the only root-cause candidate supplied by the knowledge base; it remains plausible but has not been proven for this specific incident.\n\n---\n\nSupporting Evidence\n\n| Category | Source | Details |\n|----------|--------|---------|\n| Observed Evidence | Incident record | • Platform: UiPath<br>• Status: FAULTED<br>• Exception: System.TimeoutException – “Operation timed out”<br>• Activity: Submit Payment<br>• Workflow: Payment_Processing.xaml<br>• Start/end timestamps (14:30-14:35, 5 min duration)<br>• Robot: TestRobot<br>• Machine: TEST-MACHINE<br>• Execution context: input values “Payment Transaction”, output “None”, has_recording “False”, account “test_account” |\n| Retrieved Knowledge | Knowledge base | • Root cause ID RCA-015 – “Slow application response” (confidence Medium)<br>• Verification method: “Review execution time” |\n| Model Inference | Logical deduction | The presence of a timeout exception in the absence of other error signals suggests that the activity exceeded its configured time limit, which is commonly caused by an application that is slow or unresponsive. |\n\n---\n\nRecommended Recovery Actions\nFrom the provided recovery actions (REC-014):\n- Action: Increase timeout values and retry the failed activity.\n- Automation level: Semi-Automatic\n- Notes: Monitor recurring timeout patterns.\n\n---\n\nPrevention Recommendations\n1. Set and enforce realistic timeout thresholds – Align the configured timeout with the average response time of the target application.\n2. Implement retry logic – For critical activities, automatically retry a manageable number of times before marking the process as failed.\n3. Monitor application performance – Log the execution time of key activities and alert when durations exceed the configured threshold.\n4. Periodic baseline reviews – Update timeout values when performance of the underlying application changes (e.g., after deployments or traffic spikes).\n5. Avoid hard-coded pauses – Replace generic wait activities with activity-specific Element Exists or Element Click checks that validate readiness.\n\n---\n\nConfidence\n\n- Root-cause confidence: Low – The incident evidence confirms a timeout but does not directly prove that the application was slow; verification is pending.\n- Overall incident confidence: Medium – The classification engine and observed exception strongly indicate a timeout as the failure mode, but further investigation is needed to identify the precise root cause.",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS_WITH_OBSERVATION",
+        "notes": [
+          "The RCA correctly marked slow application response as plausible rather than confirmed.",
+          "The model made general causal claims about timeout incidents, but these were presented as inference rather than observed evidence."
+        ]
+      }
+    },
+    {
+      "case_id": "BASE-006",
+      "name": "Unknown Incident",
+      "input_type": "unknown_incident",
+      "incident": {
+        "platform": "UiPath",
+        "status": "FAULTED",
+        "process": "Customer_Onboarding",
+        "package": "UiPath.System.Activities",
+        "package_version": "24.10.3",
+        "exception": {
+          "message": "The operation is not valid for the current state.",
+          "type": "System.InvalidOperationException"
+        },
+        "workflow": "Customer_Onboarding.xaml",
+        "activity": "Process Customer Record",
+        "timestamp": {
+          "start": "2026-09-05T15:15:20",
+          "end": "2026-09-05T15:15:22"
+        },
+        "robot": "TestRobot",
+        "machine": "TEST-MACHINE",
+        "execution_context": {
+          "input_values": "Customer Record",
+          "output_values": "None",
+          "has_recording": "False",
+          "account": "test_account"
+        }
+      },
+      "classification": {
+        "incident_id": null,
+        "category_id": null,
+        "subcategory": null,
+        "description": null,
+        "confidence": 0
+      },
+      "root_causes": [],
+      "recovery_actions": [],
+      "generated_rca": "RCA REPORT\n\n| Section | Content |\n|---------|---------|\n| 1. Incident Summary | On 2026-09-05 at 15:15:20, the TestRobot on machine TEST-MACHINE started the Customer_Onboarding workflow. The workflow failed after 2 seconds during the Process Customer Record activity. The robot stopped with a FAULTED status. The exception thrown was System.InvalidOperationException with the message “The operation is not valid for the current state.” |\n| 2. Failure Location | • Process: Customer_Onboarding<br>• Workflow: Customer_Onboarding.xaml<br>• Activity: Process Customer Record<br>• Exception type: System.InvalidOperationException<br>• Timestamp: 2026-09-05 15:15:20 – 2026-09-05 15:15:22 |\n| 3. Probable Root Cause | Root cause remains undetermined.<br>Plausible, unverified causes (based on the exception message):<br>1. Invalid activity state – The activity may have been invoked when its internal state was not ready (e.g., missing prerequisite data or configuration).<br>2. Concurrent or re-entrant execution – The activity could have been triggered while a previous instance was still running or completing.<br>Verification method: Review the execution logs for the Process Customer Record activity, inspect its state machine, and check for any pre-termination conditions or overlapping invocations. Verification has not yet been performed. |\n| 4. Supporting Evidence | Observed Evidence<br>• Incident metadata (platform, status, process, package, exception type/message, timestamps, robot, machine, input values).<br>• Failure occurred exactly at the Process Customer Record activity as identified by the workflow.<br><br>Retrieved Knowledge<br>• No root-cause entries or recovery actions were retrieved from the knowledge base.<br><br>Model Inference<br>• The System.InvalidOperationException exceptionally suggests that an activity was invoked in an unsupported state, but this inference is not directly observed and remains unverified. |\n| 5. Recommended Recovery Actions | No recovery actions were provided in the retrieved data set. |\n| 6. Prevention Recommendations | No actionable prevention recommendations could be derived from the incident data or the (empty) knowledge base. |\n| 7. Confidence | Low – There is insufficient evidence to confirm any root cause or to substantiate a verification of the plausible inferences. |\n\n---",
+      "evaluation": {
+        "classification": "PASS",
+        "root_cause_retrieval": "PASS",
+        "recovery_retrieval": "PASS",
+        "rca_quality": "PASS",
+        "notes": [
+          "The classifier correctly returned no known incident classification.",
+          "No root causes or recovery actions were fabricated from the knowledge base.",
+          "The RCA explicitly stated that the root cause remained undetermined.",
+          "The model still generated plausible unverified hypotheses from the exception message, but clearly separated them from observed evidence."
+        ]
+      }
+    }
+  ]
+}
