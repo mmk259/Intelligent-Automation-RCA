@@ -1,0 +1,533 @@
+{
+  "experiment": {
+    "name": "Semantic Retrieval Evaluation",
+    "method": "Embedding-based semantic retrieval using Sentence Transformers",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "retrieval_method": "Cosine similarity",
+    "top_k": 3,
+    "llm_used": false,
+    "baseline_method": "Structured retrieval",
+    "purpose": "Evaluate whether semantic retrieval improves retrieval robustness for differently worded automation incidents while identifying false-positive and ambiguity failure cases.",
+    "notes": [
+      "The existing structured retrieval implementation is preserved as the baseline.",
+      "The semantic retrieval experiment was evaluated independently before LLM-based RCA generation.",
+      "The six baseline cases were reused for direct comparison.",
+      "One additional paraphrased UI selector incident was included specifically to test robustness to different wording and exception types.",
+      "The unknown incident case was included to evaluate whether semantic retrieval can correctly abstain when no relevant knowledge exists."
+    ]
+  },
+  "test_cases": [
+    {
+      "id": "SEM-001",
+      "name": "Missing File",
+      "test_type": "known_incident",
+      "classification": {
+        "incident_id": "FILE-001",
+        "category_id": "FILE",
+        "subcategory": "Missing File",
+        "confidence": 0.8
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-006",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "possible_root_cause": "Incorrect file path",
+          "confidence": "High",
+          "similarity_score": 0.5947
+        },
+        {
+          "root_cause_id": "RCA-008",
+          "category_id": "FILE",
+          "subcategory": "Missing Folder",
+          "possible_root_cause": "Directory deleted or renamed",
+          "confidence": "High",
+          "similarity_score": 0.5871
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "possible_root_cause": "Application was closed",
+          "confidence": "High",
+          "similarity_score": 0.4818
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "suggested_recovery": "Verify that the configured file path exists before execution.",
+          "automation_level": "Manual",
+          "similarity_score": 0.6151
+        },
+        {
+          "recovery_id": "REC-006",
+          "category_id": "FILE",
+          "subcategory": "Missing Folder",
+          "suggested_recovery": "Create or verify the required directory before execution.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.5803
+        },
+        {
+          "recovery_id": "REC-005",
+          "category_id": "FILE",
+          "subcategory": "Locked File",
+          "suggested_recovery": "Wait for file release and retry the operation.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.4589
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": true,
+        "recovery_top1_correct": true,
+        "assessment": "Strong",
+        "notes": "Semantic retrieval correctly identified the most relevant root cause and recovery action."
+      }
+    },
+    {
+      "id": "SEM-002",
+      "name": "UI Selector - Exact",
+      "test_type": "known_incident",
+      "classification": {
+        "incident_id": "UI-003",
+        "category_id": "UI",
+        "subcategory": "Selector",
+        "confidence": 1.0
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "possible_root_cause": "Incorrect Attach Browser or Attach Window scope",
+          "confidence": "High",
+          "similarity_score": 0.6025
+        },
+        {
+          "root_cause_id": "RCA-004",
+          "category_id": "UI",
+          "subcategory": "Input",
+          "possible_root_cause": "Target field is disabled or hidden",
+          "confidence": "Medium",
+          "similarity_score": 0.5893
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "possible_root_cause": "Application was closed",
+          "confidence": "High",
+          "similarity_score": 0.589
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "suggested_recovery": "Verify that the configured file path exists before execution.",
+          "automation_level": "Manual",
+          "similarity_score": 0.4804
+        },
+        {
+          "recovery_id": "REC-019",
+          "category_id": "CONFIG",
+          "subcategory": "Path",
+          "suggested_recovery": "Verify configuration paths and environment variables.",
+          "automation_level": "Manual",
+          "similarity_score": 0.4643
+        },
+        {
+          "recovery_id": "REC-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "suggested_recovery": "Verify activity scope (Attach Browser/Attach Window/Use Application).",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.4576
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": false,
+        "recovery_top1_correct": false,
+        "assessment": "Poor",
+        "notes": "Semantic retrieval failed to prioritize selector-specific knowledge and returned unrelated configuration, input, application-state, and file-related entries."
+      }
+    },
+    {
+      "id": "SEM-003",
+      "name": "UI Selector - Paraphrased",
+      "test_type": "paraphrased_known_incident",
+      "classification": {
+        "incident_id": null,
+        "category_id": null,
+        "subcategory": null,
+        "confidence": 0.0
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-005",
+          "category_id": "UI",
+          "subcategory": "Focus",
+          "possible_root_cause": "Incorrect window is active",
+          "confidence": "Medium",
+          "similarity_score": 0.3418
+        },
+        {
+          "root_cause_id": "RCA-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "possible_root_cause": "Incorrect Attach Browser or Attach Window scope",
+          "confidence": "High",
+          "similarity_score": 0.3347
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "possible_root_cause": "Application was closed",
+          "confidence": "High",
+          "similarity_score": 0.3216
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-013",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "suggested_recovery": "Launch or reconnect to the target application.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.3319
+        },
+        {
+          "recovery_id": "REC-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "suggested_recovery": "Verify activity scope (Attach Browser/Attach Window/Use Application).",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.3258
+        },
+        {
+          "recovery_id": "REC-021",
+          "category_id": "CONFIG",
+          "subcategory": "Credentials",
+          "suggested_recovery": "Verify credential assets or secure credential store.",
+          "automation_level": "Manual",
+          "similarity_score": 0.2903
+        }
+      ],
+      "evaluation": {
+        "classification_failed": true,
+        "root_cause_top1_correct": false,
+        "recovery_top1_correct": false,
+        "assessment": "Weak partial robustness",
+        "notes": "Semantic retrieval produced UI- and application-related knowledge despite structured classification failing, but it did not retrieve selector-specific root causes or recovery actions. The result demonstrates partial semantic robustness without reliable retrieval accuracy."
+      }
+    },
+    {
+      "id": "SEM-004",
+      "name": "Network Path",
+      "test_type": "known_incident",
+      "classification": {
+        "incident_id": "NET-001",
+        "category_id": "NET",
+        "subcategory": "Path",
+        "confidence": 0.8
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-010",
+          "category_id": "NET",
+          "subcategory": "Path",
+          "possible_root_cause": "Shared drive unavailable",
+          "confidence": "High",
+          "similarity_score": 0.6643
+        },
+        {
+          "root_cause_id": "RCA-009",
+          "category_id": "NET",
+          "subcategory": "Connectivity",
+          "possible_root_cause": "Network outage",
+          "confidence": "Medium",
+          "similarity_score": 0.6047
+        },
+        {
+          "root_cause_id": "RCA-021",
+          "category_id": "CONFIG",
+          "subcategory": "Credentials",
+          "possible_root_cause": "Invalid credential configuration",
+          "confidence": "High",
+          "similarity_score": 0.5046
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-008",
+          "category_id": "NET",
+          "subcategory": "Path",
+          "suggested_recovery": "Validate network share availability and permissions.",
+          "automation_level": "Manual",
+          "similarity_score": 0.6236
+        },
+        {
+          "recovery_id": "REC-007",
+          "category_id": "NET",
+          "subcategory": "Connectivity",
+          "suggested_recovery": "Verify network connectivity and retry the operation.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.5163
+        },
+        {
+          "recovery_id": "REC-004",
+          "category_id": "FILE",
+          "subcategory": "Missing File",
+          "suggested_recovery": "Verify that the configured file path exists before execution.",
+          "automation_level": "Manual",
+          "similarity_score": 0.4334
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": true,
+        "recovery_top1_correct": true,
+        "assessment": "Strong",
+        "notes": "Semantic retrieval correctly prioritized the relevant network path root cause and recovery action."
+      }
+    },
+    {
+      "id": "SEM-005",
+      "name": "Terminal Session",
+      "test_type": "known_incident",
+      "classification": {
+        "incident_id": "TERM-002",
+        "category_id": "TERM",
+        "subcategory": "Session",
+        "confidence": 0.8
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-012",
+          "category_id": "TERM",
+          "subcategory": "Session",
+          "possible_root_cause": "Session expired",
+          "confidence": "High",
+          "similarity_score": 0.7138
+        },
+        {
+          "root_cause_id": "RCA-013",
+          "category_id": "TERM",
+          "subcategory": "Connection",
+          "possible_root_cause": "Terminal disconnected",
+          "confidence": "High",
+          "similarity_score": 0.6208
+        },
+        {
+          "root_cause_id": "RCA-011",
+          "category_id": "TERM",
+          "subcategory": "Login",
+          "possible_root_cause": "Invalid credentials",
+          "confidence": "High",
+          "similarity_score": 0.5489
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-010",
+          "category_id": "TERM",
+          "subcategory": "Session",
+          "suggested_recovery": "Re-establish the terminal session automatically.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.6458
+        },
+        {
+          "recovery_id": "REC-012",
+          "category_id": "TERM",
+          "subcategory": "Connection",
+          "suggested_recovery": "Reconnect to the terminal host before continuing.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.5736
+        },
+        {
+          "recovery_id": "REC-009",
+          "category_id": "TERM",
+          "subcategory": "Login",
+          "suggested_recovery": "Verify credentials and perform terminal login again.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.5528
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": true,
+        "recovery_top1_correct": true,
+        "assessment": "Strong",
+        "notes": "Semantic retrieval correctly prioritized the relevant terminal-session root cause and recovery action."
+      }
+    },
+    {
+      "id": "SEM-006",
+      "name": "Timeout",
+      "test_type": "known_incident",
+      "classification": {
+        "incident_id": "PERF-001",
+        "category_id": "PERF",
+        "subcategory": "Timeout",
+        "confidence": 0.8
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-015",
+          "category_id": "PERF",
+          "subcategory": "Timeout",
+          "possible_root_cause": "Slow application response",
+          "confidence": "Medium",
+          "similarity_score": 0.6148
+        },
+        {
+          "root_cause_id": "RCA-009",
+          "category_id": "NET",
+          "subcategory": "Connectivity",
+          "possible_root_cause": "Network outage",
+          "confidence": "Medium",
+          "similarity_score": 0.4386
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "possible_root_cause": "Application was closed",
+          "confidence": "High",
+          "similarity_score": 0.4371
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-014",
+          "category_id": "PERF",
+          "subcategory": "Timeout",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.6399
+        },
+        {
+          "recovery_id": "REC-002",
+          "category_id": "UI",
+          "subcategory": "Timing",
+          "suggested_recovery": "Increase WaitForReady, Delay, or Timeout values before retrying.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.3876
+        },
+        {
+          "recovery_id": "REC-007",
+          "category_id": "NET",
+          "subcategory": "Connectivity",
+          "suggested_recovery": "Verify network connectivity and retry the operation.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.3685
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": true,
+        "recovery_top1_correct": true,
+        "assessment": "Strong",
+        "notes": "Semantic retrieval correctly identified the timeout-related root cause and recovery action."
+      }
+    },
+    {
+      "id": "SEM-007",
+      "name": "Unknown Incident",
+      "test_type": "unknown_incident",
+      "classification": {
+        "incident_id": null,
+        "category_id": null,
+        "subcategory": null,
+        "confidence": 0.0
+      },
+      "semantic_root_causes": [
+        {
+          "root_cause_id": "RCA-014",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "possible_root_cause": "Application was closed",
+          "confidence": "High",
+          "similarity_score": 0.3724
+        },
+        {
+          "root_cause_id": "RCA-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "possible_root_cause": "Incorrect Attach Browser or Attach Window scope",
+          "confidence": "High",
+          "similarity_score": 0.345
+        },
+        {
+          "root_cause_id": "RCA-019",
+          "category_id": "DATA",
+          "subcategory": "Invalid Data",
+          "possible_root_cause": "Invalid business data",
+          "confidence": "High",
+          "similarity_score": 0.336
+        }
+      ],
+      "semantic_recovery_actions": [
+        {
+          "recovery_id": "REC-013",
+          "category_id": "APP",
+          "subcategory": "Application State",
+          "suggested_recovery": "Launch or reconnect to the target application.",
+          "automation_level": "Automatic",
+          "similarity_score": 0.3158
+        },
+        {
+          "recovery_id": "REC-014",
+          "category_id": "PERF",
+          "subcategory": "Timeout",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.2721
+        },
+        {
+          "recovery_id": "REC-020",
+          "category_id": "CONFIG",
+          "subcategory": "Scope",
+          "suggested_recovery": "Verify activity scope (Attach Browser/Attach Window/Use Application).",
+          "automation_level": "Semi-Automatic",
+          "similarity_score": 0.2654
+        }
+      ],
+      "evaluation": {
+        "root_cause_top1_correct": false,
+        "recovery_top1_correct": false,
+        "abstention_expected": true,
+        "assessment": "Major failure",
+        "notes": "Semantic retrieval returned the nearest knowledge-base entries even though the classifier identified the incident as unknown. This demonstrates a false-positive retrieval problem when no similarity threshold or abstention mechanism is applied."
+      }
+    }
+  ],
+  "summary": {
+    "shared_cases_with_baseline": 6,
+    "additional_robustness_cases": 1,
+    "known_incident_cases": 5,
+    "known_incident_root_cause_top1_correct": 4,
+    "known_incident_recovery_top1_correct": 4,
+    "unknown_incident_abstention_correct": false,
+    "main_findings": [
+      "Semantic retrieval correctly identified relevant root causes and recovery actions for several known incidents, including Missing File, Network Path, Terminal Session, and Timeout.",
+      "Semantic retrieval performed poorly on the exact UI Selector case, retrieving related but incorrect knowledge.",
+      "The paraphrased UI Selector case demonstrated partial robustness because semantic retrieval still returned UI/application-related knowledge even though structured classification failed, but the retrieved results were not sufficiently specific.",
+      "The unknown incident exposed a major false-positive problem: unrestricted semantic retrieval always returns nearest neighbours even when none are sufficiently relevant.",
+      "Semantic similarity alone is therefore useful but insufficient as a standalone retrieval strategy for reliable RCA."
+    ]
+  },
+  "limitations": [
+    "The evaluation uses a small manually constructed incident set.",
+    "The knowledge base is relatively small and manually authored.",
+    "Similarity scores are retrieval scores, not calibrated probabilities.",
+    "No similarity threshold or abstention mechanism was applied in this first experiment.",
+    "The experiment evaluates retrieval independently of LLM-generated RCA quality.",
+    "The embedding model was not tuned specifically for automation failure logs."
+  ],
+  "next_experiment": {
+    "description": "Evaluate iterative RCA verification while preserving the current semantic retrieval results as a frozen experiment artifact.",
+    "reason": "The semantic retrieval experiment establishes both useful retrieval improvements and important failure modes that should be preserved before evaluating the LLM verification loop."
+  }
+}

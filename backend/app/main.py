@@ -6,7 +6,10 @@ from app.retriever import retrieve_root_causes
 from app.recovery_engine import retrieve_recovery_actions
 from app.llm_integration import generate_rca
 from app.rca_generator import generate_rca_report
-
+from app.semantic_rag import (
+    retrieve_semantic_root_causes,
+    retrieve_semantic_recovery_actions
+)
 
 app = FastAPI(
     title="Intelligent Automation RCA",
@@ -55,3 +58,27 @@ def analyze_incident(request: AnalyzeRequest):
             status_code=500,
             detail=str(e)
         )
+
+@app.post("/analyze/semantic")
+def analyze_semantic(request: AnalyzeRequest):
+    incident = parse_uipath_log(request.log)
+    classification = classify_incident(incident)
+
+    semantic_root_causes = retrieve_semantic_root_causes(
+        incident,
+        classification,
+        top_k=3
+    )
+
+    semantic_recovery_actions = retrieve_semantic_recovery_actions(
+        incident,
+        classification,
+        top_k=3
+    )
+
+    return {
+        "incident": incident,
+        "classification": classification,
+        "root_causes": semantic_root_causes,
+        "recovery_actions": semantic_recovery_actions
+    }
