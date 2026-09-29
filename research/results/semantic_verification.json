@@ -1,0 +1,384 @@
+{
+  "experiment": "Verified Semantic RCA",
+  "method": {
+    "retrieval": "semantic",
+    "generation": "baseline LLM RCA generation",
+    "verification": "V2 iterative verification and revision",
+    "test_cases": 6,
+    "retrieval_top_k": 3
+  },
+  "results": [
+    {
+      "test_case": "Missing File",
+      "classification": {
+        "incident_id": "FILE-001",
+        "category_id": "FILE",
+        "subcategory": "Missing File"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-006",
+          "possible_root_cause": "Incorrect file path",
+          "similarity_score": 0.5947
+        },
+        {
+          "root_cause_id": "RCA-008",
+          "possible_root_cause": "Directory deleted/renamed",
+          "similarity_score": 0.5871
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "possible_root_cause": "Application closed",
+          "similarity_score": 0.4818
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "suggested_recovery": "Missing File recovery action",
+          "similarity_score": 0.6151
+        },
+        {
+          "recovery_id": "REC-006",
+          "suggested_recovery": "Missing Folder recovery action",
+          "similarity_score": 0.5803
+        },
+        {
+          "recovery_id": "REC-005",
+          "suggested_recovery": "Locked File recovery action",
+          "similarity_score": 0.4589
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Invented UTC timestamp.",
+        "Unsupported prevention recommendations.",
+        "Irrelevant/weak REC-005 recovery action.",
+        "Causal wording was presented too strongly."
+      ],
+      "revision_actions": [
+        "Removed the UTC timestamp.",
+        "Removed unsupported prevention recommendations.",
+        "Removed the weak/irrelevant REC-005 recovery action.",
+        "Retained relevant candidates as unverified."
+      ],
+      "remaining_issues": [
+        "Revision introduced an unsupported inference about workflow path construction."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "UI Selector",
+      "classification": {
+        "incident_id": "UI-003",
+        "category_id": "UI",
+        "subcategory": "Selector"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-020",
+          "possible_root_cause": "Incorrect Attach Browser or Attach Window scope",
+          "similarity_score": 0.6025
+        },
+        {
+          "root_cause_id": "RCA-004",
+          "possible_root_cause": "Target disabled/hidden",
+          "similarity_score": 0.5893
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "possible_root_cause": "Application closed",
+          "similarity_score": 0.589
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "suggested_recovery": "Missing File recovery action",
+          "similarity_score": 0.4804
+        },
+        {
+          "recovery_id": "REC-019",
+          "suggested_recovery": "Configuration Path recovery action",
+          "similarity_score": 0.4643
+        },
+        {
+          "recovery_id": "REC-020",
+          "suggested_recovery": "Verify activity scope (Attach Browser/Attach Window/Use Application).",
+          "similarity_score": 0.4576
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unqualified technical claims.",
+        "Overstatement of RCA-020.",
+        "Unsupported application-closed assertion.",
+        "Irrelevant recovery actions REC-004 and REC-019.",
+        "Unsupported prevention recommendations.",
+        "Confidence overstatement."
+      ],
+      "revision_actions": [
+        "Marked root causes as candidate/unverified.",
+        "Retained REC-020 and removed unrelated recovery actions.",
+        "Removed unsupported prevention recommendations.",
+        "Lowered root-cause confidence."
+      ],
+      "remaining_issues": [
+        "Revision retained a qualified technical inference linking NodeNotFoundException to selector/scope issues."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Network Path",
+      "classification": {
+        "incident_id": "NET-001",
+        "category_id": "NET",
+        "subcategory": "Path"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-010",
+          "possible_root_cause": "Shared drive unavailable",
+          "similarity_score": 0.6643
+        },
+        {
+          "root_cause_id": "RCA-009",
+          "possible_root_cause": "Network outage",
+          "similarity_score": 0.6047
+        },
+        {
+          "root_cause_id": "RCA-021",
+          "possible_root_cause": "Invalid credential config",
+          "similarity_score": 0.5046
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-008",
+          "suggested_recovery": "Validate network share availability and permissions.",
+          "similarity_score": 0.6236
+        },
+        {
+          "recovery_id": "REC-007",
+          "suggested_recovery": "Verify network connectivity and retry the operation.",
+          "similarity_score": 0.5163
+        },
+        {
+          "recovery_id": "REC-004",
+          "suggested_recovery": "Missing File recovery action",
+          "similarity_score": 0.4334
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Invented UTC timestamp.",
+        "Unsupported prevention recommendations.",
+        "Unjustified Medium incident-specific confidence."
+      ],
+      "revision_actions": [
+        "Removed the UTC timestamp.",
+        "Removed unsupported prevention recommendations.",
+        "Lowered confidence.",
+        "Preserved root causes as candidates/unverified."
+      ],
+      "remaining_issues": [
+        "Revision introduced a technical inference about UNC/network-share access."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Terminal Session",
+      "classification": {
+        "incident_id": "TERM-002",
+        "category_id": "TERM",
+        "subcategory": "Session"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-012",
+          "possible_root_cause": "Session expired",
+          "similarity_score": 0.7138
+        },
+        {
+          "root_cause_id": "RCA-013",
+          "possible_root_cause": "Terminal disconnected",
+          "similarity_score": 0.6208
+        },
+        {
+          "root_cause_id": "RCA-011",
+          "possible_root_cause": "Invalid credentials",
+          "similarity_score": 0.5489
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-010",
+          "suggested_recovery": "Re-establish the terminal session automatically.",
+          "similarity_score": 0.6458
+        },
+        {
+          "recovery_id": "REC-012",
+          "suggested_recovery": "Reconnect to the terminal host before continuing.",
+          "similarity_score": 0.5736
+        },
+        {
+          "recovery_id": "REC-009",
+          "suggested_recovery": "Verify credentials and perform terminal login again.",
+          "similarity_score": 0.5528
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Session expiry was presented as evidence rather than inference.",
+        "Unsupported invalid-credentials root cause.",
+        "Unsupported credential recovery action.",
+        "Unsupported prevention recommendations.",
+        "Root-cause confidence overstatement."
+      ],
+      "revision_actions": [
+        "Removed the invalid-credentials cause and recovery action.",
+        "Removed generic prevention recommendations.",
+        "Retained session/disconnection candidates as unverified.",
+        "Lowered root-cause confidence."
+      ],
+      "remaining_issues": [
+        "Revision retained a qualified inference that the exception suggests a missing session."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Timeout",
+      "classification": {
+        "incident_id": "PERF-001",
+        "category_id": "PERF",
+        "subcategory": "Timeout"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-015",
+          "possible_root_cause": "Slow application response",
+          "similarity_score": 0.6148
+        },
+        {
+          "root_cause_id": "RCA-009",
+          "possible_root_cause": "Network outage",
+          "similarity_score": 0.4386
+        },
+        {
+          "root_cause_id": "RCA-014",
+          "possible_root_cause": "Application was closed",
+          "similarity_score": 0.4371
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-014",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "similarity_score": 0.6399
+        },
+        {
+          "recovery_id": "REC-002",
+          "suggested_recovery": "Increase WaitForReady, Delay, or Timeout values before retrying.",
+          "similarity_score": 0.3876
+        },
+        {
+          "recovery_id": "REC-007",
+          "suggested_recovery": "Verify network connectivity and retry the operation.",
+          "similarity_score": 0.3685
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported most-likely-cause claim.",
+        "Inferred absence of network/application-state errors.",
+        "Unsupported prevention recommendations."
+      ],
+      "revision_actions": [
+        "Converted causes to candidate/unverified status.",
+        "Removed unsupported prevention recommendations.",
+        "Retained low root-cause confidence."
+      ],
+      "remaining_issues": [
+        "Revision still referred to an absence of explicit network/application errors not established by the supplied payload."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Unknown Incident",
+      "classification": {
+        "incident_id": null,
+        "category_id": null,
+        "subcategory": null,
+        "confidence": 0
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-014",
+          "possible_root_cause": "Application was closed",
+          "similarity_score": 0.3724
+        },
+        {
+          "root_cause_id": "RCA-020",
+          "possible_root_cause": "Incorrect Attach Browser or Attach Window scope",
+          "similarity_score": 0.345
+        },
+        {
+          "root_cause_id": "RCA-019",
+          "possible_root_cause": "Invalid business data",
+          "similarity_score": 0.336
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-013",
+          "suggested_recovery": "Launch or reconnect to the target application.",
+          "similarity_score": 0.3158
+        },
+        {
+          "recovery_id": "REC-014",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "similarity_score": 0.2721
+        },
+        {
+          "recovery_id": "REC-020",
+          "suggested_recovery": "Verify activity scope (Attach Browser/Attach Window/Use Application).",
+          "similarity_score": 0.2654
+        }
+      ],
+      "verification_assessment": "PASS",
+      "verification_findings": [],
+      "revision_actions": [
+        "No revision required.",
+        "RCA preserved candidate/unverified status.",
+        "No confirmed root cause was stated.",
+        "Overall confidence remained Low."
+      ],
+      "remaining_issues": [
+        "Verifier did not flag weak semantic retrieval candidates as retrieval-relevance problems.",
+        "Weak semantic matches were still returned because the retriever has no abstention threshold."
+      ],
+      "verification_correctly_identified_problem": null,
+      "substantive_improvement": null,
+      "revision_fully_grounded": true
+    }
+  ],
+  "overall_findings": {
+    "verifier_detection": "The V2 verifier identified substantive grounding problems in five of six cases and passed the Unknown Incident RCA.",
+    "revision_behavior": "The revision stage generally improved grounding, uncertainty handling, and removal of unsupported prevention recommendations, but repeatedly introduced new domain-derived explanations or assumptions.",
+    "strongest_case": "Unknown Incident",
+    "main_failure_mode": "Revision introduces technically plausible domain knowledge that is not traceable to the permitted incident, classification, or retrieved knowledge sources.",
+    "retrieval_relevance": "Semantic retrieval was generally relevant for the primary candidates in known incidents but also returned neighboring or irrelevant root causes/recovery actions; it did not abstain on the unknown incident.",
+    "verification_retrieval_interaction": "Verification improved the generated RCA but did not consistently detect weak semantic retrieval itself, particularly in the Unknown Incident case.",
+    "architecture_status": "V2 verification component frozen for subsequent experiments."
+  }
+}

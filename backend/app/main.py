@@ -5,9 +5,10 @@ from app.classifier import classify_incident
 from app.retriever import retrieve_root_causes
 from app.recovery_engine import retrieve_recovery_actions
 from app.llm_integration import generate_rca
-from app.rca_generator import generate_rca_report
-from app.semantic_rag import (retrieve_semantic_root_causes,retrieve_semantic_recovery_actions)
-from app.rca_verification import generate_verified_rca
+from app.structured_rca_generator import generate_rca_report
+from app.semantic_rca_generator import (retrieve_semantic_root_causes,retrieve_semantic_recovery_actions)
+from app.structured_verification import generate_verified_rca
+from app.semantic_verification import generate_combined_rca
 
 app = FastAPI(
     title="Intelligent Automation RCA",
@@ -117,6 +118,50 @@ def analyze_verified(request: AnalyzeRequest):
             "initial_rca": verified_result["initial_rca"],
             "verification_result": verified_result["verification_result"],
             "revised_rca": verified_result["revised_rca"]
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze/combined")
+def analyze_combined(request: AnalyzeRequest):
+    try:
+        incident = parse_uipath_log(request.log)
+        classification = classify_incident(incident)
+
+        result = generate_combined_rca(
+            incident,
+            classification,
+            top_k=3
+        )
+
+        return {
+            "incident": incident,
+            **result
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+@app.post("/analyze/combined")
+def analyze_combined(request: AnalyzeRequest):
+    try:
+        incident = parse_uipath_log(request.log)
+        classification = classify_incident(incident)
+
+        result = generate_combined_rca(
+            incident=incident,
+            classification=classification,
+            top_k=3
+        )
+
+        return {
+            "incident": incident,
+            "classification": classification,
+            **result
         }
 
     except Exception as e:

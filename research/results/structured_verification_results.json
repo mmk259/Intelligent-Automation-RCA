@@ -1,0 +1,257 @@
+{
+  "experiment": "Structured RCA Verification",
+  "method": {
+    "retrieval": "structured",
+    "generation": "baseline LLM RCA generation",
+    "verification": "V2 iterative verification and revision",
+    "test_cases": 6
+  },
+  "results": [
+    {
+      "test_case": "Missing File",
+      "classification": {
+        "incident_id": "FILE-001",
+        "category_id": "FILE",
+        "subcategory": "Missing File"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-006",
+          "possible_root_cause": "Incorrect file path",
+          "confidence": "High"
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-004",
+          "suggested_recovery": "Verify configured file path exists before execution.",
+          "automation_level": "Manual"
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unqualified causal wording stating that the exception directly indicates the supplied file path does not resolve.",
+        "Unsupported prevention recommendations."
+      ],
+      "revision_actions": [
+        "Removed unsupported prevention recommendations.",
+        "Qualified the causal wording as a possible indication rather than a confirmed fact.",
+        "Explicitly stated that the candidate root cause remained unverified."
+      ],
+      "remaining_issues": [
+        "Revision introduced additional general domain knowledge stating that FileNotFoundException errors frequently indicate a missing or incorrect file path.",
+        "Section numbering skipped Section 6 after removal of the prevention section."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "UI Selector",
+      "classification": {
+        "incident_id": "UI-003",
+        "category_id": "UI",
+        "subcategory": "Selector"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-001",
+          "possible_root_cause": "Selector changed after UI update",
+          "confidence": "High"
+        },
+        {
+          "root_cause_id": "RCA-002",
+          "possible_root_cause": "Dynamic attributes",
+          "confidence": "High"
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-001",
+          "suggested_recovery": "Validate selector via UI Explorer."
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported prevention recommendations.",
+        "Overall incident confidence was not sufficiently supported.",
+        "Timestamp was incorrectly represented as UTC even though no timezone was supplied."
+      ],
+      "revision_actions": [
+        "Removed incident-specific prevention recommendations.",
+        "Lowered overall confidence to Low.",
+        "Retained candidate root causes as unverified.",
+        "Separated observed evidence from model inference."
+      ],
+      "remaining_issues": [
+        "Revision continued to include UTC despite the incident timestamp containing no timezone.",
+        "Revision introduced additional model inference connecting the classification and retrieved candidates to the selector-related error."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Network Path",
+      "classification": {
+        "incident_id": "NET-001",
+        "category_id": "NET",
+        "subcategory": "Path"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-010",
+          "possible_root_cause": "Shared drive unavailable",
+          "confidence": "High"
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-008",
+          "suggested_recovery": "Validate network share availability and permissions."
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported prevention recommendations.",
+        "Unsupported confidence level.",
+        "Unverified root-cause framing."
+      ],
+      "revision_actions": [
+        "Removed prevention recommendations.",
+        "Reframed the root cause as a candidate/unverified cause.",
+        "Reduced confidence."
+      ],
+      "remaining_issues": [
+        "Revision introduced general Windows/domain knowledge about what a missing UNC path indicates.",
+        "Revision introduced additional hypothetical causes such as connectivity problems, offline shares, removal, or renaming that were not supplied by the permitted sources.",
+        "Section numbering skipped Section 6."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Terminal Session",
+      "classification": {
+        "incident_id": "TERM-002",
+        "category_id": "TERM",
+        "subcategory": "Session"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-012",
+          "possible_root_cause": "Session expired",
+          "confidence": "High"
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-010",
+          "suggested_recovery": "Re-establish the terminal session automatically.",
+          "automation_level": "Automatic"
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported UTC timezone designation.",
+        "Unsupported prevention recommendations."
+      ],
+      "revision_actions": [
+        "Removed the UTC designation.",
+        "Removed prevention recommendations.",
+        "Explicitly identified the root cause as a candidate/unverified cause.",
+        "Reduced root-cause and overall confidence to Low."
+      ],
+      "remaining_issues": [
+        "Revision added general domain knowledge describing SessionNotFoundException as a typical indication of a closed or timed-out session.",
+        "Model inference still introduced an unsupported explanation that the session had likely expired or been disconnected."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Timeout",
+      "classification": {
+        "incident_id": "PERF-001",
+        "category_id": "PERF",
+        "subcategory": "Timeout"
+      },
+      "retrieved_root_causes": [
+        {
+          "root_cause_id": "RCA-015",
+          "possible_root_cause": "Slow application response",
+          "confidence": "Medium"
+        }
+      ],
+      "retrieved_recovery_actions": [
+        {
+          "recovery_id": "REC-014",
+          "suggested_recovery": "Increase timeout values and retry the failed activity.",
+          "automation_level": "Semi-Automatic"
+        }
+      ],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported prevention recommendations.",
+        "Root cause was presented as probable despite lacking incident-specific verification.",
+        "Recovery action was presented too definitively despite not being tested."
+      ],
+      "revision_actions": [
+        "Removed unsupported prevention recommendations.",
+        "Changed root cause to possible/unverified.",
+        "Explicitly stated that verification was pending.",
+        "Qualified the recovery action as recommended but untested.",
+        "Reduced overall confidence."
+      ],
+      "remaining_issues": [
+        "Revision retained a general domain explanation that timeouts most commonly result from downstream applications not responding in time.",
+        "This explanation was not present in the permitted evidence sources."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": false
+    },
+    {
+      "test_case": "Unknown Incident",
+      "classification": {
+        "incident_id": null,
+        "category_id": null,
+        "subcategory": null,
+        "confidence": 0
+      },
+      "retrieved_root_causes": [],
+      "retrieved_recovery_actions": [],
+      "verification_assessment": "NEEDS_REVISION",
+      "verification_findings": [
+        "Unsupported UTC timezone designation.",
+        "Unsupported claim regarding the absence of additional clues in event logs.",
+        "Unsupported generic prevention recommendations."
+      ],
+      "revision_actions": [
+        "Removed UTC designation.",
+        "Replaced unsupported log-related claim with a statement limited to the supplied evidence.",
+        "Removed generic prevention recommendations.",
+        "Explicitly stated that the root cause remains undetermined.",
+        "Stated that no evidence-grounded recovery action could be established.",
+        "Maintained Low confidence."
+      ],
+      "remaining_issues": [
+        "Minor wording remained stronger than strictly necessary when describing the absence of additional logs or stack traces.",
+        "Section numbering skipped Section 6 after removing prevention recommendations."
+      ],
+      "verification_correctly_identified_problem": true,
+      "substantive_improvement": true,
+      "revision_fully_grounded": true
+    }
+  ],
+  "overall_findings": {
+    "verifier_detection": "The V2 verifier consistently identified substantive grounding problems across the six structured RCA cases.",
+    "revision_behavior": "The revision stage generally improved grounding, uncertainty handling, and removal of unsupported prevention recommendations, but repeatedly introduced new domain-derived explanations or assumptions.",
+    "strongest_case": "Unknown Incident",
+    "main_failure_mode": "Revision introduces technically plausible domain knowledge that is not traceable to the permitted incident, classification, or retrieved knowledge sources.",
+    "retrieval_relevance": "Structured retrieval was generally aligned with the corresponding classified incidents.",
+    "architecture_status": "V2 verification component frozen for subsequent experiments."
+  }
+}
