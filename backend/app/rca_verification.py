@@ -6,19 +6,25 @@ def build_verification_prompt(
     classification,
     root_causes,
     recovery_actions,
-    generated_rca
+    generated_rca,
 ):
     return f"""
-You are an RCA verification assistant for an enterprise automation
-incident analysis system.
+You are the verification and correction-planning component of an
+enterprise automation RCA system.
 
-Your task is to verify whether the generated RCA is grounded in the
-information actually provided to the system.
+Your job is to critically evaluate the generated RCA against the supplied
+incident evidence and retrieved knowledge, then produce a precise correction
+plan for a separate revision model.
 
-Do NOT generate a new RCA.
-Do NOT introduce new evidence, root causes, recovery actions, or facts.
+Do NOT write a new RCA.
+Do NOT rewrite the RCA.
+Do NOT invent evidence, root causes, recovery actions, or facts.
 
-The generated RCA MUST be evaluated ONLY against these permitted sources:
+Your output is a CRITIQUE and CORRECTION PLAN only.
+
+PERMITTED SOURCES
+=================
+The RCA may rely only on:
 
 1. Observed incident information
 2. Classification information
@@ -26,8 +32,31 @@ The generated RCA MUST be evaluated ONLY against these permitted sources:
 4. Retrieved recovery-action knowledge
 
 General domain knowledge, common failure patterns, technical assumptions,
-and plausible explanations are NOT evidence unless they are explicitly
-supported by one of the permitted sources.
+and plausible explanations are NOT evidence unless explicitly supported by
+one of the permitted sources.
+
+IMPORTANT DISTINCTIONS
+======================
+
+- Retrieved knowledge proves only that a possibility exists in the knowledge
+  base. It does NOT prove that the possibility occurred in this incident.
+
+- Knowledge-base confidence is NOT incident-specific confidence.
+
+- Classifier confidence is NOT a statistical probability.
+
+- Model inference may be included only when it is clearly labeled as
+  inference and does not contradict the supplied evidence.
+
+- Model inference must never be presented as observed evidence or as a
+  confirmed root cause.
+
+- Retrieval relevance is separate from grounding. A retrieved item can be
+  valid KB knowledge and still be a poor match for this incident.
+
+- A statement being labeled "possible", "likely", "plausible",
+  "unverified", or "inferred" does NOT automatically make it acceptable.
+  Determine whether the statement is useful and appropriately grounded.
 
 ====================
 INCIDENT
@@ -55,197 +84,220 @@ GENERATED RCA
 {generated_rca}
 
 ====================
-VERIFICATION TASK
+EVALUATION TASK
 ====================
 
-Evaluate the generated RCA claim-by-claim against the permitted sources.
+Evaluate the generated RCA claim-by-claim.
 
-For every substantive factual claim, determine:
+A. GROUNDING
+===========
 
-1. What information supports the claim?
-2. Which permitted source contains that information?
-3. Whether the claim is directly supported, a clearly labeled inference,
-   or unsupported.
+For every substantive factual or diagnostic statement, determine whether it
+is:
 
-A claim is considered supported ONLY when it can be traced to the
-information provided in the permitted sources.
+- directly supported by observed incident information
+- directly supported by classification information
+- supported only as retrieved knowledge
+- clearly labeled model inference
+- unsupported
 
-Do NOT consider a claim supported merely because it is:
+Flag:
 
-- plausible
-- common for this type of incident
-- technically reasonable
-- likely
-- typical of similar automation failures
-- a reasonable diagnostic possibility
-- consistent with general domain knowledge
+- invented evidence
+- environment details not supplied
+- configuration details not supplied
+- timestamp/timezone details not supplied
+- diagnostic results not supplied
+- retrieved knowledge presented as observed evidence
+- inference presented as fact
+- unsupported root causes
+- unsupported recovery actions
+- unsupported prevention recommendations
+- confidence stronger than the incident evidence supports
+- failure to preserve uncertainty
+- failure to abstain when evidence is insufficient
 
-Retrieved knowledge describing a possible root cause does NOT prove that
-the root cause occurred in this specific incident.
+B. RETRIEVAL RELEVANCE
+======================
 
-Knowledge-base confidence describes the confidence of the knowledge-base
-entry, NOT the confidence that the cause actually occurred in this
-incident.
+Evaluate whether the RCA's selected or preferred root causes and recovery
+actions actually fit the incident.
+
+For each preferred root cause or recovery action, classify it as:
+
+- RELEVANT
+  Directly matches the observed incident or classification.
+
+- RELATED_BUT_UNCONFIRMED
+  Semantically related and potentially useful, but not established by
+  incident evidence.
+
+- POOR_MATCH
+  Retrieved item is meaningfully mismatched to the incident.
+
+- UNSUPPORTED
+  The item is not present in the supplied retrieved knowledge.
+
+Do NOT mark an item RELEVANT merely because it exists in the knowledge base.
+
+C. INSUFFICIENT EVIDENCE
+========================
+
+Determine whether the RCA appropriately handles uncertainty.
+
+If the incident does not establish a specific root cause, the RCA should
+identify the cause as unverified or undetermined.
+
+If multiple retrieved candidates exist but none is confirmed, the RCA should
+not select one as the confirmed cause.
+
+If no evidence-grounded recovery action is available, the RCA must not invent
+one.
+
+D. CONFIDENCE
+=============
+
+Evaluate whether the final confidence reflects the actual incident evidence.
+
+Do NOT allow:
+
+- high KB confidence to become high incident confidence
+- classifier confidence to become incident certainty
+- semantic similarity score to become proof of a root cause
+
+E. CORRECTION PLAN
+==================
+
+For every substantive problem, create a concrete correction that another
+LLM can apply directly.
+
+For each issue specify:
+
+- Problem:
+  What is wrong.
+
+- Action:
+  One of:
+  REMOVE
+  REWRITE
+  QUALIFY
+  OMIT
+
+- Required Change:
+  Exactly what the revision model should do.
+
+- Source to Preserve:
+  Which permitted source should remain in the revised RCA.
+
+- Source/Content to Remove:
+  What unsupported or incorrect content must be removed.
+
+- Replacement Allowed:
+  YES or NO
+
+- Target Wording Guidance:
+  Describe how the revised statement should be framed.
+
+IMPORTANT ACTION RULES
+======================
+
+REMOVE:
+Delete the unsupported content.
+
+OMIT:
+Delete the content and do not replace it with newly generated information.
+
+REWRITE:
+Rewrite the statement using only permitted sources.
+
+QUALIFY:
+Retain the underlying information only if it is explicitly framed with
+appropriate uncertainty and does not imply confirmation.
+
+IMPORTANT REPLACEMENT RULE
+==========================
+
+If Replacement Allowed is NO, the revision model MUST NOT replace the removed
+content with another claim, assumption, recommendation, timestamp,
+environment detail, or technical explanation.
+
+If Replacement Allowed is YES, the replacement must be grounded in the
+specified permitted source.
 
 ====================
-CHECK THE FOLLOWING
+DECISION RULE
 ====================
 
-1. Unsupported Claims
-   - Identify any substantive claim that cannot be supported by the
-     permitted sources.
-   - Flag claims involving facts, environment details, configuration
-     details, timestamps, diagnostic results, causes, or other
-     information that was not provided.
+Return NEEDS_REVISION if there is any substantive issue involving:
 
-2. Invented Evidence
-   - Identify any detail presented as observed evidence that does not
-     appear in the incident information.
+- grounding
+- retrieval relevance
+- unsupported root-cause selection
+- unsupported recovery selection
+- inappropriate confidence
+- insufficient-evidence handling
+- unsupported prevention
+- invented evidence
+- unsupported model-generated content
 
-3. Evidence Classification Problems
-   - Retrieved knowledge presented as observed evidence.
-   - Model inference presented as observed evidence.
-   - Unverified assumptions presented as established facts.
+PASS is allowed only when:
 
-4. Unsupported Root Causes
-   - Root causes presented as confirmed without incident evidence.
-   - Root causes introduced by the RCA that do not appear in the
-     retrieved root-cause knowledge.
-   - Plausible or common root causes that are not supported by the
-     provided information.
+1. There are no substantive grounding violations.
+2. No preferred root cause or recovery action is a POOR_MATCH or UNSUPPORTED.
+3. Confidence is appropriate to the incident evidence.
+4. Insufficient evidence is handled correctly.
+5. No substantive unsupported content requires correction.
 
-5. Unsupported Recovery Actions
-   - Recovery actions that do not appear in the retrieved
-     recovery-action knowledge.
-   - Recovery actions introduced from general domain knowledge.
-
-6. Unsupported Model-Generated Content
-   - Identify substantive content generated by the RCA model that
-     cannot be traced to any permitted source.
-   - A statement being technically reasonable does NOT make it
-     evidence-grounded.
-
-7. Incorrect Confidence
-   - Confidence stronger than the available incident evidence supports.
-   - Knowledge-base confidence incorrectly treated as incident-specific
-     confidence.
-   - Unverified causes presented with High or Medium incident-specific
-     confidence without sufficient evidence.
-
-8. Unsupported Prevention Recommendations
-   - Recommendations presented as facts.
-   - Recommendations based on information that was not provided.
-   - Recommendations that assume a root cause that has not been verified.
-
-9. Insufficient-Evidence Handling
-   - Check whether the RCA appropriately abstains when evidence is
-     insufficient.
-   - If the incident does not establish a root cause, the RCA should
-     state that the root cause is undetermined or unverified rather than
-     inventing a plausible explanation.
-   - If no evidence-grounded recovery action is available, the RCA
-     should not invent one.
-
-10. Other Grounding Problems
-   - Any statement that could mislead an automation engineer about what
-     is actually known, retrieved, inferred, or unknown.
-
-====================
-CRITICAL DECISION RULE
-====================
-
-PASS is allowed ONLY when the generated RCA is sufficiently grounded
-in the permitted sources.
-
-If ANY substantive unsupported claim, invented evidence, unsupported
-root cause, unsupported recovery action, or unsupported factual
-assumption is identified, the Overall Assessment MUST be:
-
-NEEDS_REVISION
-
-Do NOT return PASS merely because an unsupported statement is described
-as:
-- possible
-- plausible
-- likely
-- unverified
-- inferred
-
-If a statement is not supported by the permitted information, flag it.
-
-If the evidence is insufficient to establish the root cause, the RCA
-must explicitly preserve that uncertainty.
+Do NOT return PASS merely because an unsupported statement is called
+possible, plausible, likely, unverified, or inferred.
 
 ====================
 OUTPUT FORMAT
 ====================
 
-Return the verification result using exactly these sections:
+Return exactly these sections:
 
 VERIFICATION RESULT
 
 Overall Assessment:
 PASS / NEEDS_REVISION
 
-Unsupported Claims:
-- List each unsupported claim.
-- If none exist, write "None identified."
+Grounding Problems:
+- Each problem with a short quoted or paraphrased RCA claim and why it is
+  unsupported.
+- If none: None identified.
 
-Invented Evidence:
-- List each invented detail.
-- If none exist, write "None identified."
-
-Evidence Classification Problems:
-- List each problem.
-- If none exist, write "None identified."
-
-Root Cause Problems:
-- List each problem.
-- If none exist, write "None identified."
-
-Recovery Action Problems:
-- List each problem.
-- If none exist, write "None identified."
-
-Unsupported Model-Generated Content:
-- List each unsupported substantive statement.
-- If none exist, write "None identified."
+Retrieval Relevance Problems:
+- Each preferred root cause or recovery action that is a poor or weak match,
+  with the reason.
+- If none: None identified.
 
 Confidence Problems:
-- List each problem.
-- If none exist, write "None identified."
+- Each confidence issue.
+- If none: None identified.
 
-Prevention Recommendation Problems:
-- List each problem.
-- If none exist, write "None identified."
+Insufficient-Evidence Problems:
+- Each failure to abstain, preserve uncertainty, or distinguish candidates
+  from confirmed causes.
+- If none: None identified.
 
-Insufficient-Evidence Handling Problems:
-- List each problem.
-- If none exist, write "None identified."
+Correction Plan:
+For every substantive issue use exactly:
 
-Other Grounding Problems:
-- List each problem.
-- If none exist, write "None identified."
+- Problem:
+- Action:
+- Required Change:
+- Source to Preserve:
+- Source/Content to Remove:
+- Replacement Allowed:
+- Target Wording Guidance:
 
-Required Revisions:
-- List the specific changes required before the RCA can be considered
-  sufficiently grounded.
-- If no revisions are required, write "None."
+If no corrections are required:
+None.
 
-IMPORTANT:
-Do not treat knowledge-base confidence labels as incident-specific
-confidence.
-
-Do not treat classifier confidence as a statistical probability.
-
-Do not invent missing information.
-
-Do not assume that a plausible root cause has been verified.
-
-Do not treat general domain knowledge as evidence.
-
-Evaluate the generated RCA against the supplied evidence, not against
-what would normally be expected for this type of incident.
+Do not write a revised RCA.
+Do not provide general best-practice advice.
+Do not introduce any new domain knowledge.
 """
 
 
@@ -254,14 +306,14 @@ def verify_rca(
     classification,
     root_causes,
     recovery_actions,
-    generated_rca
+    generated_rca,
 ):
     prompt = build_verification_prompt(
         incident,
         classification,
         root_causes,
         recovery_actions,
-        generated_rca
+        generated_rca,
     )
 
     response = client.chat(
@@ -269,9 +321,9 @@ def verify_rca(
         messages=[
             {
                 "role": "user",
-                "content": prompt
+                "content": prompt,
             }
-        ]
+        ],
     )
 
     return response.message.content
@@ -283,41 +335,151 @@ def build_revision_prompt(
     root_causes,
     recovery_actions,
     generated_rca,
-    verification_result
+    verification_result,
 ):
     return f"""
-You are an enterprise automation RCA revision assistant.
+You are the RCA correction and revision component of an enterprise
+automation incident analysis system.
 
-Revise the generated RCA using the verification findings provided
-below.
+Your task is to produce an improved version of the generated RCA by applying
+the verifier's Correction Plan.
 
-The revised RCA MUST remain grounded ONLY in:
+The verifier's Correction Plan is the authoritative instruction for what must
+be corrected.
 
-- Observed incident information
-- Classification information
-- Retrieved root-cause knowledge
-- Retrieved recovery-action knowledge
+Do NOT mention the verifier or the revision process in the final RCA.
 
-Do NOT introduce new evidence, root causes, recovery actions, or facts.
+GROUNDING CONTRACT
+==================
 
-Do NOT remove uncertainty merely to make the RCA sound more confident.
+The revised RCA may use ONLY:
 
-Root causes from the knowledge base are possible causes unless the
-incident evidence directly verifies them.
+1. Observed incident information
+2. Classification information
+3. Retrieved root-cause knowledge
+4. Retrieved recovery-action knowledge
+
+Do NOT introduce:
+
+- new facts
+- new technical assumptions
+- new root causes
+- new recovery actions
+- new timestamps
+- new timezones
+- new environment details
+- new configuration details
+- new diagnostic results
+- unsupported prevention recommendations
+
+RETRIEVAL CONTRACT
+==================
+
+A retrieved KB item is not automatically the incident's root cause.
+
+If the verifier identifies an item as:
+
+RELEVANT:
+It may be used as retrieved knowledge when appropriate.
+
+RELATED_BUT_UNCONFIRMED:
+It may be retained only as an unverified candidate if useful.
+
+POOR_MATCH:
+Do not use it as the selected root cause or recommended recovery action.
+
+UNSUPPORTED:
+Do not use it.
+
+Do not convert retrieval similarity into certainty.
+
+UNCERTAINTY CONTRACT
+====================
+
+If the evidence does not establish a root cause:
+
+- explicitly state that the root cause is unverified or undetermined
+- distinguish candidate causes from confirmed causes
+- do not select a candidate merely because it has high KB confidence
+- do not derive incident confidence from KB confidence
+- do not derive incident confidence from classifier confidence
+- do not derive incident confidence from semantic similarity
+
+EVIDENCE CONTRACT
+=================
 
 Clearly distinguish:
+
 - Observed Evidence
 - Retrieved Knowledge
 - Model Inference
 
-Do not present model inference as observed evidence.
+Observed Evidence must contain only information actually supplied by the
+incident.
 
-Do not present retrieved knowledge as observed evidence.
+Retrieved Knowledge must contain only information retrieved from the supplied
+knowledge base.
 
-Use only the provided recovery actions.
+Model Inference must be clearly identified as inference.
 
-If evidence is insufficient to determine the root cause, explicitly
-state that the root cause remains undetermined or unverified.
+Never present retrieved knowledge or model inference as observed evidence.
+
+RECOVERY CONTRACT
+=================
+
+Use only recovery actions contained in the supplied retrieved recovery-action
+knowledge.
+
+Do not invent recovery actions.
+
+Only retain actions that the verifier considers relevant or appropriate to
+retain.
+
+If no appropriate recovery action is supported, state that no
+evidence-grounded recovery action can be established from the available
+sources.
+
+PREVENTION CONTRACT
+===================
+
+Do not invent incident-specific prevention recommendations.
+
+If the supplied sources do not support a prevention recommendation:
+
+- do not generate a generic best-practice recommendation
+- do not replace the missing recommendation with domain knowledge
+- state that no incident-specific prevention recommendation can be
+  established from the available evidence
+
+CORRECTION PLAN CONTRACT
+========================
+
+Apply EVERY substantive correction in the verifier's Correction Plan.
+
+The Action field has the following meaning:
+
+REMOVE:
+Remove the identified content.
+
+OMIT:
+Remove the content and DO NOT replace it with a newly generated claim.
+
+REWRITE:
+Rewrite the content using only the permitted sources.
+
+QUALIFY:
+Retain the information only with the uncertainty framing specified by the
+verifier.
+
+Replacement Allowed:
+If the verifier says NO, do not replace the removed content with another
+claim, assumption, recommendation, timestamp, environment detail, or technical
+explanation.
+
+If the verifier says YES, any replacement must be grounded in the permitted
+sources and follow the Target Wording Guidance.
+
+Do not independently undo a verifier correction.
 
 ====================
 INCIDENT
@@ -345,7 +507,7 @@ INITIAL RCA
 {generated_rca}
 
 ====================
-VERIFICATION FINDINGS
+VERIFIER RESULT + CORRECTION PLAN
 ====================
 {verification_result}
 
@@ -353,7 +515,7 @@ VERIFICATION FINDINGS
 REVISION TASK
 ====================
 
-Produce a corrected RCA using these sections:
+Produce the corrected RCA using exactly these sections:
 
 1. Incident Summary
 2. Failure Location
@@ -363,17 +525,101 @@ Produce a corrected RCA using these sections:
 6. Prevention Recommendations
 7. Confidence
 
-Apply every required revision identified by the verifier.
+SECTION REQUIREMENTS
+====================
 
-Do not add information that was not available to the initial RCA.
+1. Incident Summary
+-------------------
+Summarize only the observed incident information.
 
-For Confidence, provide a qualitative incident-specific confidence
-level: High, Medium, or Low.
+Do not add environment details or technical assumptions.
 
-Remember:
-Knowledge-base confidence is NOT incident-specific confidence.
-Classifier confidence is NOT a statistical probability.
-Unverified root causes must not be presented as confirmed.
+2. Failure Location
+-------------------
+Identify the workflow/activity/location only when supported by the supplied
+incident or classification information.
+
+Otherwise state that the failure location is not established.
+
+3. Probable Root Cause
+----------------------
+Distinguish clearly between:
+
+- confirmed cause
+- candidate/unverified cause
+- undetermined cause
+
+If no cause is established, say that the root cause remains unverified or
+undetermined.
+
+Do not present a retrieved KB cause as confirmed merely because it is a strong
+semantic match.
+
+4. Supporting Evidence
+----------------------
+Include only:
+
+- supplied incident evidence
+- classification information when relevant
+- clearly labeled retrieved knowledge
+- clearly labeled model inference where appropriate
+
+Never place inference under observed evidence.
+
+5. Recommended Recovery Actions
+--------------------------------
+Use only appropriate recovery actions from the supplied retrieved knowledge.
+
+Do not invent actions.
+
+Do not use a POOR_MATCH or UNSUPPORTED retrieved action.
+
+6. Prevention Recommendations
+-----------------------------
+Use only prevention guidance explicitly supported by the supplied sources.
+
+If no incident-specific prevention recommendation can be established,
+explicitly state that.
+
+Do not replace missing prevention evidence with generic best practices.
+
+7. Confidence
+-------------
+Provide incident-specific:
+
+High
+Medium
+Low
+
+Low is appropriate when the root cause is not verified.
+
+Do not derive incident confidence directly from:
+
+- KB confidence
+- classifier confidence
+- semantic similarity
+
+====================
+FINAL REQUIREMENTS
+====================
+
+The revised RCA must:
+
+- preserve observed evidence exactly
+- preserve retrieved knowledge as retrieved knowledge
+- preserve appropriate uncertainty
+- distinguish candidates from confirmed causes
+- use only appropriate retrieved recovery actions
+- avoid unsupported prevention recommendations
+- apply every verifier correction
+- avoid introducing new facts
+- avoid introducing domain knowledge as evidence
+- avoid replacing removed unsupported content when replacement is prohibited
+
+Do not mention the verifier.
+Do not mention the revision process.
+Do not explain your reasoning.
+Return only the revised RCA.
 """
 
 
@@ -383,7 +629,7 @@ def revise_rca(
     root_causes,
     recovery_actions,
     generated_rca,
-    verification_result
+    verification_result,
 ):
     prompt = build_revision_prompt(
         incident,
@@ -391,7 +637,7 @@ def revise_rca(
         root_causes,
         recovery_actions,
         generated_rca,
-        verification_result
+        verification_result,
     )
 
     response = client.chat(
@@ -399,9 +645,9 @@ def revise_rca(
         messages=[
             {
                 "role": "user",
-                "content": prompt
+                "content": prompt,
             }
-        ]
+        ],
     )
 
     return response.message.content
@@ -412,14 +658,14 @@ def generate_verified_rca(
     classification,
     root_causes,
     recovery_actions,
-    generated_rca
+    generated_rca,
 ):
     verification_result = verify_rca(
         incident,
         classification,
         root_causes,
         recovery_actions,
-        generated_rca
+        generated_rca,
     )
 
     revised_rca = revise_rca(
@@ -428,101 +674,11 @@ def generate_verified_rca(
         root_causes,
         recovery_actions,
         generated_rca,
-        verification_result
+        verification_result,
     )
 
     return {
         "initial_rca": generated_rca,
         "verification_result": verification_result,
-        "revised_rca": revised_rca
+        "revised_rca": revised_rca,
     }
-
-if __name__ == "__main__":
-    sample_incident = {
-        "platform": "UiPath",
-        "status": "FAULTED",
-        "process": "Loan_Disbursal",
-        "exception": {
-            "type": "UiPath.Core.SelectorNotFoundException",
-            "message": "NodeNotFoundException"
-        },
-        "workflow": "Loan_Disbursal.xaml",
-        "activity": "Click Submit"
-    }
-
-    sample_classification = {
-        "incident_id": "UI-003",
-        "category_id": "UI",
-        "subcategory": "Selector",
-        "description": "Target UI node could not be located.",
-        "confidence": 0.8
-    }
-
-    sample_root_causes = [
-        {
-            "root_cause_id": "RCA-001",
-            "possible_root_cause": "Selector changed after UI update",
-            "confidence": "High",
-            "verification_method": "Compare selector with current UI"
-        },
-        {
-            "root_cause_id": "RCA-002",
-            "possible_root_cause": "Dynamic attributes in selector",
-            "confidence": "High",
-            "verification_method": "Inspect selector attributes"
-        }
-    ]
-
-    sample_recovery_actions = [
-        {
-            "recovery_id": "REC-001",
-            "suggested_recovery": (
-                "Validate selector using UI Explorer and update if required."
-            ),
-            "automation_level": "Semi-Automatic",
-            "notes": "Human verification recommended."
-        }
-    ]
-
-    initial_rca = """
-1. Incident Summary
-The Loan_Disbursal process failed during the Click Submit activity.
-
-2. Failure Location
-Process: Loan_Disbursal
-Activity: Click Submit
-
-3. Probable Root Cause
-The selector may have changed after a UI update.
-
-4. Supporting Evidence
-Observed Evidence: NodeNotFoundException.
-Retrieved Knowledge: RCA-001 and RCA-002.
-Model Inference: A selector-related issue is plausible but unverified.
-
-5. Recommended Recovery Actions
-REC-001: Validate the selector using UI Explorer.
-
-6. Prevention Recommendations
-Review selector robustness and avoid volatile attributes.
-
-7. Confidence
-Root-cause confidence: Low.
-"""
-
-    result = generate_verified_rca(
-        sample_incident,
-        sample_classification,
-        sample_root_causes,
-        sample_recovery_actions,
-        initial_rca
-    )
-
-    print("\n================ INITIAL RCA ================\n")
-    print(result["initial_rca"])
-
-    print("\n================ VERIFICATION ================\n")
-    print(result["verification_result"])
-
-    print("\n================ REVISED RCA ================\n")
-    print(result["revised_rca"])
