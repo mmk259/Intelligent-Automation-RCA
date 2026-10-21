@@ -1,940 +1,611 @@
-Evaluation
 
-1. Evaluation Objective
+# Evaluation
 
-The evaluation assesses the Intelligent Automation RCA system across
-classification, knowledge retrieval, recovery recommendation, RCA
-generation, evidence grounding, uncertainty handling, and handling of
-unknown incidents.
+## 1. Evaluation Objective
 
-The evaluation uses four controlled system configurations:
+This evaluation examines the Intelligent Automation RCA system across incident classification, knowledge retrieval, recovery recommendation, RCA generation, evidence grounding, uncertainty handling, and unknown-incident handling.
 
-Structured RCA (baseline)
+Four controlled configurations are evaluated:
 
-Semantic RCA
+1. **Structured RCA** — structured retrieval with single-pass LLM generation.
+2. **Semantic RCA** — semantic retrieval with single-pass LLM generation.
+3. **Verified Structured RCA** — structured retrieval with V2 verification and revision.
+4. **Verified Semantic RCA (Combined)** — semantic retrieval with V2 verification and revision.
 
-Verified Structured RCA
+The same six representative incident cases are used across the four configurations wherever the corresponding experiment is supported:
 
-Verified Semantic RCA (Combined)
+- Missing File
+- UI Selector
+- Network Path
+- Terminal Session
+- Timeout
+- Unknown Incident
 
-The same six representative incident cases are used across the four
-configurations wherever the pipeline supports the corresponding
-experiment:
+The semantic retrieval experiment additionally includes one paraphrased UI-selector case as a robustness test. This additional case is not included in the main six-case comparison.
 
-Missing File
+The experimental design keeps the underlying LLM model consistent across configurations. Structured retrieval, semantic retrieval, and verification-assisted revision are evaluated as separate components to help distinguish their respective effects.
 
-UI Selector
+The evaluation is an initial controlled engineering study, not a statistically representative benchmark.
 
-Network Path
+## 2. Evaluation Configurations
 
-Terminal Session
+### 2.1 Structured RCA Baseline
 
-Timeout
+The baseline configuration uses:
 
-Unknown Incident
+- Structured incident classification
+- Structured root-cause retrieval
+- Structured recovery retrieval
+- Single-pass LLM-based RCA generation
 
-The semantic retrieval experiment additionally includes one paraphrased
-UI-selector case as a robustness test. This additional case is not
-included in the six-case four-condition comparison.
+**Pipeline:**
 
-The evaluation is designed so that the configurations can be compared
-without changing the underlying LLM model. The baseline RCA generation
-function is retained as the common generation component, while semantic
-retrieval and iterative verification are introduced as separate
-experimental components.
-
-2. Evaluation Configurations
-
-2.1 Structured RCA Baseline
-
-The baseline system uses:
-
-Structured incident classification
-
-Structured root-cause retrieval
-
-Structured recovery retrieval
-
-Single-pass LLM-based RCA generation
-
-The pipeline is:
-
+```text
 Incident
-    ↓
+   ↓
 Structured Classification
-    ↓
+   ↓
 Structured Root-Cause Retrieval
-    ↓
+   ↓
 Structured Recovery Retrieval
-    ↓
+   ↓
 Single-Pass RCA Generation
+```
 
-The baseline is the reference configuration for the subsequent
-experiments.
+This configuration serves as the reference for the subsequent experiments.
 
-The complete baseline outputs and case-level observations are preserved
-in:
+The saved baseline outputs should be identified using the actual result files in the repository. Do not use the legacy filename `baseline_results.json` unless that file exists.
 
-research/results/baseline_results.json
+### 2.2 Semantic RCA
 
-2.2 Semantic RCA
+The semantic RCA configuration replaces structured knowledge retrieval with embedding-based semantic retrieval.
 
-The semantic RCA experiment replaces the structured knowledge retrieval
-stage with embedding-based semantic retrieval.
+The retrieval configuration uses:
 
-The semantic retrieval component uses:
+| Parameter | Configuration |
+|---|---|
+| Embedding model | `all-MiniLM-L6-v2` |
+| Similarity metric | Cosine similarity |
+| Root-cause retrieval | Top-k = 3 |
+| Recovery retrieval | Top-k = 3 |
+| RCA generation | Baseline single-pass LLM generation |
 
-Embedding model: all-MiniLM-L6-v2
+**Pipeline:**
 
-Similarity metric: cosine similarity
-
-Root-cause retrieval: top-k = 3
-
-Recovery retrieval: top-k = 3
-
-LLM generation: baseline single-pass RCA generation
-
-The pipeline is:
-
+```text
 Incident
-    ↓
+   ↓
 Structured Classification
-    ↓
+   ↓
 Semantic Root-Cause Retrieval
-    ↓
+   ↓
 Semantic Recovery Retrieval
-    ↓
+   ↓
 Single-Pass RCA Generation
+```
 
-Semantic retrieval is performed independently of whether structured
-classification succeeds. This allows semantically similar knowledge to
-be retrieved even when the incident cannot be assigned a structured
-category.
+Semantic retrieval can return candidates even when structured classification fails. However, returning candidates does not establish that those candidates are relevant or sufficient for diagnosis.
 
-The six baseline cases were reused to enable direct comparison with
-structured retrieval.
+The six core cases are reused for comparison with structured retrieval. The additional paraphrased UI-selector case assesses whether semantic retrieval can identify relevant knowledge when the wording and exception type change.
 
-An additional paraphrased UI-selector case was introduced to evaluate
-robustness to changes in wording and exception type. This case is
-treated as a robustness test rather than part of the main six-case
-comparison.
+The experiment demonstrates that semantic retrieval can identify relevant knowledge for several known incidents. However, the unrestricted top-k approach can also return weakly related or irrelevant candidates.
 
-The semantic retrieval results showed that semantic similarity can
-retrieve relevant knowledge for several known incidents, but the current
-unrestricted top-k implementation can also retrieve related or
-irrelevant knowledge.
+The saved semantic retrieval outputs are located at:
 
-The complete semantic retrieval outputs are preserved in:
+- `research/results/semantic_retrieval_results.json`
 
-research/results/semantic_rag_results.json
+### 2.3 Verified Structured RCA
 
-2.3 Verified Structured RCA
+The verified structured configuration retains the baseline classification and retrieval pipeline and adds the V2 verification and revision process.
 
-The verified structured RCA experiment retains the baseline structured
-classification and retrieval pipeline and adds the V2 iterative
-verification and revision loop.
+**Pipeline:**
 
-The pipeline is:
-
+```text
 Incident
-    ↓
+   ↓
 Structured Classification
-    ↓
+   ↓
 Structured Root-Cause Retrieval
-    ↓
+   ↓
 Structured Recovery Retrieval
-    ↓
+   ↓
 Initial RCA Generation
-    ↓
+   ↓
 V2 RCA Verification
-    ↓
+   ↓
 Verification Findings
-    ↓
+   ↓
 RCA Revision
-    ↓
-Verified Structured RCA
+   ↓
+Revised Structured RCA
+```
 
-The verification stage evaluates the generated RCA against the permitted
-evidence sources:
+The verifier assesses the generated RCA against the permitted evidence sources:
 
-Observed incident information
+- Observed incident information
+- Structured classification
+- Retrieved root-cause knowledge
+- Retrieved recovery-action knowledge
 
-Structured classification
+The verification process checks for issues including:
 
-Retrieved root-cause knowledge
+- Unsupported claims
+- Invented evidence
+- Incorrect evidence classification
+- Unsupported root-cause claims
+- Unsupported recovery actions
+- Unsupported model-generated content
+- Incorrect confidence assessments
+- Unsupported prevention recommendations
+- Inadequate handling of insufficient evidence
+- Other grounding problems
 
-Retrieved recovery-action knowledge
+Substantive unsupported claims or evidence can trigger a `NEEDS_REVISION` outcome under the verifier's decision criteria.
 
-The verifier checks for:
+The revision stage is instructed to use the original incident information, classification, retrieved knowledge, and verification findings.
 
-Unsupported claims
+The same configured LLM, `gpt-oss:20b-cloud`, is used for generation, verification, and revision.
 
-Invented evidence
+The V2 verifier was frozen before the Combined experiment to avoid further prompt tuning specifically for that configuration.
 
-Incorrect evidence classification
+The saved structured verification results are located at:
 
-Unsupported root-cause claims
+- `research/results/structured_verification_results.json`
 
-Unsupported recovery actions
+### 2.4 Verified Semantic RCA (Combined)
 
-Unsupported model-generated content
+The Combined configuration integrates semantic retrieval with the V2 verification and revision process.
 
-Incorrect confidence
+It is not a fifth experimental method. It combines the two experimental components:
 
-Unsupported prevention recommendations
+1. Semantic retrieval
+2. V2 verification and revision
 
-Insufficient-evidence handling
+**Pipeline:**
 
-Other grounding problems
-
-The verifier uses a strict decision rule: substantive unsupported claims
-or unsupported evidence are sufficient to require revision.
-
-The revision stage is instructed to use only the original incident,
-classification, retrieved knowledge, and verification findings.
-
-The same LLM model, gpt-oss:20b-cloud, is used for RCA generation,
-verification, and revision.
-
-The V2 verifier was frozen before the Combined experiment so that the
-Combined results do not reflect further prompt tuning.
-
-The complete verified structured outputs are preserved in:
-
-research/results/iterative_verification_results.json
-
-2.4 Verified Semantic RCA (Combined)
-
-The Combined configuration integrates semantic retrieval with the frozen
-V2 verification and revision mechanism.
-
-It is therefore not treated as a fifth experimental method. It is the
-combination of the two experimental components:
-
-Semantic retrieval
-
-V2 iterative verification and revision
-
-The pipeline is:
-
+```text
 Incident
-    ↓
+   ↓
 Structured Classification
-    ↓
+   ↓
 Semantic Root-Cause Retrieval
-    ↓
+   ↓
 Semantic Recovery Retrieval
-    ↓
-Initial Semantic RCA
-    ↓
+   ↓
+Initial RCA Generation
+   ↓
 V2 RCA Verification
-    ↓
+   ↓
 Verification Findings
-    ↓
+   ↓
 RCA Revision
-    ↓
-Verified Semantic RCA
+   ↓
+Revised Semantic RCA
+```
 
-The same all-MiniLM-L6-v2 semantic retrieval configuration and the
-same frozen V2 verifier are used.
+The configuration uses the same `all-MiniLM-L6-v2` retrieval setup and frozen V2 verifier.
 
-The same baseline LLM, gpt-oss:20b-cloud, is used for generation,
-verification, and revision.
+The same configured LLM, `gpt-oss:20b-cloud`, is used for generation, verification, and revision.
 
-This configuration allows two important comparisons:
+This configuration supports two principal comparisons:
 
-Semantic RCA vs Verified Semantic RCA: effect of verification after
-semantic retrieval.
+- **Semantic RCA vs. Verified Semantic RCA:** Examines the effect of adding verification and revision to semantic retrieval.
+- **Verified Structured RCA vs. Verified Semantic RCA:** Examines differences between structured and semantic retrieval when verification is applied.
 
-Verified Structured RCA vs Verified Semantic RCA: effect of
-structured versus semantic retrieval after verification.
+The saved semantic verification results are located at:
 
-The complete Combined outputs are preserved in:
+- `research/results/semantic_verification.json`
 
-research/results/verified_semantic_rca_cumulative_results.json
+## 3. Four-Configuration Experimental Design
 
-3. Four-Configuration Experimental Design
+| Configuration | Classification | Retrieval | Initial generation | Verification | Revision |
+|---|---|---|---|---|---|
+| Structured RCA | Structured | Structured | Single-pass LLM | None | None |
+| Semantic RCA | Structured | Semantic | Single-pass LLM | None | None |
+| Verified Structured RCA | Structured | Structured | Single-pass LLM | V2 verifier | V2 revision |
+| Verified Semantic RCA (Combined) | Structured | Semantic | Single-pass LLM | V2 verifier | V2 revision |
 
-The four configurations can be represented as follows:
+The principal comparisons are:
 
-Configuration   Classification   Retrieval    RCA           Verification   Revision
-Generation
+| Comparison | Primary question |
+|---|---|
+| Structured RCA vs. Semantic RCA | What changes when structured retrieval is replaced by semantic retrieval? |
+| Structured RCA vs. Verified Structured RCA | What changes when V2 verification and revision are added to structured retrieval? |
+| Semantic RCA vs. Verified Semantic RCA | Does verification remain useful when retrieval is semantic? |
+| Verified Structured RCA vs. Verified Semantic RCA | How do the retrieval methods differ when both use verification? |
 
-Structured RCA  Structured       Structured   Single-pass   None           None
-LLM
+This design helps separate retrieval effects from verification effects rather than attributing every observed change to a single component.
 
-Semantic RCA    Structured       Semantic     Single-pass   None           None
-LLM
+## 4. Structured vs. Semantic Retrieval
 
-Verified        Structured       Structured   Single-pass   V2 LLM         V2 LLM
-Structured RCA                                LLM           verifier       revision
+For the five known incidents shared between the structured and semantic retrieval experiments, semantic retrieval correctly ranked the corresponding root-cause and recovery-action entries first in four cases.
 
-The comparisons are interpreted as:
+| Incident | Structured root cause | Semantic root cause | Structured recovery | Semantic recovery |
+|---|---|---|---|---|
+| Missing File | Correct | Correct | Correct | Correct |
+| UI Selector | Correct | Incorrect | Correct | Incorrect |
+| Network Path | Correct | Correct | Correct | Correct |
+| Terminal Session | Correct | Correct | Correct | Correct |
+| Timeout | Correct | Correct | Correct | Correct |
 
-Comparison                   Primary Question
+The UI-selector case was the principal known-incident retrieval failure. Semantic similarity ranked related UI, application, or configuration knowledge above selector-specific knowledge.
 
-Structured RCA vs Semantic   What is the effect of replacing structured
-RCA                          retrieval with semantic retrieval?
+The Unknown Incident exposed another limitation: unrestricted nearest-neighbour retrieval returns the top three candidates even when no sufficiently relevant knowledge match has been established.
 
-Structured RCA vs Verified   What is the effect of adding V2
-Structured RCA               verification and revision?
+Consequently, semantic retrieval can broaden matching beyond exact taxonomy terms, but it can also introduce ambiguity and false-positive candidates.
 
-Semantic RCA vs Verified     Does verification remain useful when
-Semantic RCA                 retrieval is semantic rather than
-structured?
+These results describe performance on the current manually selected cases; they should not be interpreted as a general accuracy estimate.
 
-This design separates the effects of retrieval and verification rather
-than attributing all changes between the systems to a single component.
+## 5. Paraphrase Robustness
 
-4. Structured vs Semantic Retrieval
+An additional paraphrased UI-selector incident was evaluated using semantic retrieval.
 
-For the five known incidents shared between the structured and semantic
-retrieval experiments, semantic retrieval correctly ranked the
-corresponding top root cause and recovery action in four cases.
-
-Incident     Structured Root  Semantic Root    Structured     Semantic
-Cause            Cause            Recovery       Recovery
-
-Missing File Correct          Correct          Correct        Correct
-
-UI Selector  Correct          Incorrect        Correct        Incorrect
-
-Network Path Correct          Correct          Correct        Correct
-
-Terminal     Correct          Correct          Correct        Correct
-Session
-
-Timeout      Correct          Correct          Correct        Correct
-
-The UI-selector case was the main known-incident retrieval failure.
-Semantic similarity ranked related UI/application/configuration
-knowledge above selector-specific knowledge.
-
-The Unknown Incident also exposed a limitation of unrestricted
-nearest-neighbour retrieval. The semantic retriever always returns the
-top three results and therefore produces candidate knowledge even when
-the incident has no sufficiently relevant known classification or
-knowledge match.
-
-The semantic results therefore demonstrate broader matching behaviour
-but also introduce retrieval ambiguity and false positives.
-
-5. Paraphrase Robustness
-
-An additional paraphrased UI-selector incident was evaluated using
-semantic retrieval.
-
-The paraphrased case changed the wording and exception type while
-describing the same underlying failure.
+The case changed the wording and exception type while describing the same underlying failure.
 
 Structured classification did not identify the incident:
 
-Incident ID: None
+- **Incident ID:** None
+- **Category:** None
+- **Confidence:** 0
 
-Category: None
+Semantic retrieval nevertheless returned UI-, configuration-, and application-related knowledge.
 
-Confidence: 0
+However, the retrieved results did not contain sufficiently specific selector-related root causes and recovery actions for a reliable diagnosis.
 
-Semantic retrieval nevertheless returned UI-, configuration-, and
-application-related knowledge.
+This indicates partial robustness to changed wording, but not sufficient retrieval specificity for reliable diagnosis.
 
-However, the retrieved results did not contain the selector-specific
-root causes or recovery actions required for a reliable diagnosis.
+The result is therefore treated as evidence of partial semantic matching rather than successful paraphrase-level diagnosis.
 
-This indicates partial robustness to changed wording, but not sufficient
-retrieval specificity for reliable diagnosis.
+## 6. Case-Level Failure Analysis
 
-The result is therefore treated as evidence of partial semantic matching
-rather than successful paraphrase-level diagnosis.
+### 6.1 Missing File
 
-6. Four-Configuration Failure Analysis
-
-6.1 Missing File
-
-The semantic retriever returned relevant primary candidates including
-the incorrect file path root cause and directory-related knowledge. It
-also returned an unrelated locked-file recovery action.
+Semantic retrieval returned relevant candidates related to incorrect file paths and directory issues. It also returned an unrelated locked-file recovery action.
 
 The initial Verified Semantic RCA contained:
 
-An unsupported UTC timestamp
+- An unsupported UTC timestamp
+- An invented prevention recommendation
+- An irrelevant recovery action
+- Root-cause statements stronger than the available evidence supported
 
-An invented prevention recommendation
+The V2 verifier returned `NEEDS_REVISION`.
 
-An irrelevant recovery action
+The revised report:
 
-Root-cause statements that were stronger than the available evidence
+- Removed the unsupported timestamp.
+- Removed the invented prevention recommendation.
+- Removed the irrelevant recovery action.
+- Presented root causes as candidates rather than confirmed causes.
+- Reduced root-cause confidence.
 
-The V2 verifier classified the output as NEEDS_REVISION.
+A residual domain-derived inference remained in the revised report.
 
-The revision:
+This case illustrates that verification-assisted revision can improve grounding and remove some retrieval-related relevance problems. However, revision does not guarantee that every remaining statement is directly supported by the available evidence.
 
-Removed the unsupported timestamp
+### 6.2 UI Selector
 
-Removed the invented prevention recommendation
-
-Removed the irrelevant recovery action
-
-Preserved root causes as candidates rather than confirmed causes
-
-Lowered root-cause confidence appropriately
-
-A residual domain-derived inference remained in the revised RCA.
-
-This case demonstrates that verification can correct both generation
-grounding problems and retrieval-related relevance problems, although
-the revision stage can still introduce softer domain-derived inferences.
-
-6.2 UI Selector
-
-Semantic retrieval returned several related UI/application candidates,
-but also returned unrelated recovery actions.
+Semantic retrieval returned related UI and application candidates, together with some unrelated recovery actions.
 
 The initial Verified Semantic RCA:
 
-Overstated the relevance of one root-cause candidate
+- Overstated the relevance of a root-cause candidate.
+- Included generalized UiPath or domain-related claims.
+- Included unrelated recovery actions.
+- Added unsupported prevention recommendations.
+- Overstated confidence.
 
-Included generalized UiPath/domain claims
+The V2 verifier returned `NEEDS_REVISION`.
 
-Included unrelated recovery actions
+The revised report:
 
-Added unsupported prevention recommendations
+- Removed unrelated recovery actions.
+- Reframed root causes as unverified candidates.
+- Removed unsupported prevention recommendations.
+- Reduced root-cause confidence.
+- Preserved uncertainty around the diagnosis.
 
-Overstated confidence
+A residual qualified domain inference remained in the revised report.
 
-The V2 verifier classified the output as NEEDS_REVISION.
+This case illustrates that verification can identify grounding problems and that revision can reduce some consequences of irrelevant semantic retrieval. It also demonstrates that a revised report may retain inferences that are not directly established by the evidence.
 
-The revision:
+### 6.3 Network Path
 
-Removed unrelated recovery actions
-
-Reframed root causes as unverified candidates
-
-Removed unsupported prevention recommendations
-
-Lowered root-cause confidence
-
-Preserved uncertainty around the diagnosis
-
-A residual qualified domain inference remained in the revised RCA.
-
-This case demonstrates that verification can detect both generation
-grounding errors and semantic retrieval relevance problems.
-
-6.3 Network Path
-
-Semantic retrieval returned relevant network-share and network-outage
-root-cause candidates and relevant network recovery actions. One
-additional recovery action was weakly related.
+Semantic retrieval returned relevant candidates associated with network shares and network outages, along with relevant network recovery actions. One additional recovery action was weakly related.
 
 The initial Verified Semantic RCA contained:
 
-An unsupported UTC timestamp
+- An unsupported UTC timestamp
+- An invented prevention recommendation
+- An unjustified Medium confidence level
+- An overly strong interpretation of the network-path evidence
 
-An invented prevention recommendation
+The V2 verifier returned `NEEDS_REVISION`.
 
-An unjustified Medium confidence level
+The revised report:
 
-A strong interpretation of the network path evidence
+- Removed the unsupported timestamp.
+- Removed the prevention recommendation.
+- Reduced confidence.
+- Preserved retrieved causes as unverified candidates.
 
-The V2 verifier classified the output as NEEDS_REVISION.
+A residual technical inference remained in the revised report.
 
-The revision:
+The case illustrates improved grounding after verification while demonstrating that revision may introduce general technical knowledge beyond what the evidence directly establishes.
 
-Removed the unsupported timestamp
+### 6.4 Terminal Session
 
-Removed the prevention recommendation
-
-Reduced confidence
-
-Preserved the retrieved causes as unverified candidates
-
-A residual technical inference remained in the revised output.
-
-This case demonstrates improved grounding after verification while also
-showing that the revision model may introduce general technical
-knowledge even when the verifier has correctly identified the original
-problem.
-
-6.4 Terminal Session
-
-Semantic retrieval returned relevant session-expiry and terminal
-disconnection candidates. It also retrieved invalid-credential knowledge
-that was not directly supported by the incident.
+Semantic retrieval returned relevant session-expiry and terminal-disconnection candidates. It also retrieved invalid-credential knowledge that was not directly supported by the incident.
 
 The initial Verified Semantic RCA:
 
-Treated session expiry as evidence rather than a hypothesis
+- Treated session expiry as established evidence rather than a hypothesis.
+- Presented invalid credentials as a possible cause without supporting evidence.
+- Included unsupported credential-related recovery.
+- Added generic prevention recommendations.
+- Overstated confidence.
 
-Presented invalid credentials as a possible cause without supporting
-evidence
+The V2 verifier returned `NEEDS_REVISION`.
 
-Included unsupported credential-related recovery
+The revised report:
 
-Added generic prevention recommendations
-
-Overstated confidence
-
-The V2 verifier classified the output as NEEDS_REVISION.
-
-The revision:
-
-Removed the unsupported credential cause
-
-Removed the unsupported credential recovery action
-
-Removed prevention recommendations
-
-Reframed remaining causes as unverified candidates
-
-Lowered root-cause and overall confidence
+- Removed the unsupported credential cause.
+- Removed the unsupported credential recovery action.
+- Removed prevention recommendations.
+- Reframed remaining causes as unverified candidates.
+- Reduced root-cause and overall confidence.
 
 A residual qualified domain inference remained.
 
-This demonstrates that verification can reduce unsupported diagnosis and
-recovery claims while preserving uncertainty.
+This case demonstrates that verification-assisted revision can reduce unsupported diagnostic and recovery claims while preserving uncertainty.
 
-6.5 Timeout
+### 6.5 Timeout
 
-Semantic retrieval returned the expected slow-application-response
-candidate as the top root cause and the timeout/retry recovery action as
-the top recovery result. Weaker network and application-state candidates
-were also retrieved.
+Semantic retrieval ranked the expected slow-application-response candidate first and returned a timeout/retry recovery action as the top recovery result. Weaker network and application-state candidates were also retrieved.
 
 The initial Verified Semantic RCA:
 
-Treated the observed five-minute duration as a configured timeout
+- Treated the observed five-minute duration as evidence of a configured timeout.
+- Inferred the absence of diagnostics not present in the incident payload.
+- Presented slow application response too strongly.
+- Added unsupported prevention recommendations.
 
-Inferred the absence of diagnostics that were not present in the
-incident payload
+The V2 verifier returned `NEEDS_REVISION`.
 
-Presented slow application response too strongly
+The revised report:
 
-Added unsupported prevention recommendations
+- Removed the unsupported timeout interpretation.
+- Removed the inferred absence of diagnostics.
+- Reframed the root cause as an unverified candidate.
+- Removed prevention recommendations.
+- Reduced root-cause confidence.
 
-The V2 verifier classified the output as NEEDS_REVISION.
+A residual inference about the absence of explicit network or application-state messages remained.
 
-The revision:
+This case provides evidence that the verification loop can correct specific unsupported interpretations of observed incident data, although the revision may still retain residual inferences.
 
-Removed the unsupported timeout interpretation
+### 6.6 Unknown Incident: Retrieval and Verification Limitation
 
-Removed the inferred absence of diagnostics
+The Unknown Incident exposed a limitation in the combined semantic-retrieval and verification configuration. Semantic retrieval returned nearest-neighbour root-cause and recovery candidates despite the absence of a known incident classification. The verification stage returned `PASS` for the generated RCA in this case, even though the retrieved candidates were weakly relevant.
 
-Reframed the root cause as an unverified candidate
+This result shows that verification of generated report content and evaluation of retrieval relevance are separate requirements. A report can pass the implemented verification check without establishing that the retrieved knowledge is sufficiently relevant to the incident.
 
-Removed prevention recommendations
+The result should not be interpreted as evidence that the combined system reliably abstains on unknown incidents. Future evaluation should assess retrieval relevance explicitly and investigate a calibrated abstention mechanism.
 
-Lowered root-cause confidence
+The structured and semantic configurations should also be distinguished:
 
-A residual inference about the absence of explicit network or
-application-state messages remained.
+- **Structured retrieval:** The Unknown Incident did not produce a structured classification or corresponding structured root-cause and recovery retrieval.
+- **Semantic retrieval:** The retriever still returned nearest-neighbour candidates despite the absence of a known incident classification.
+- **Verification:** The V2 verifier returned `PASS` for the semantic Unknown Incident.
+- **Interpretation:** The verifier's `PASS` is its assessment under the implemented checks. It is not an independent guarantee of report correctness or retrieval relevance.
 
-This case provides evidence that the verification loop can correct
-specific unsupported interpretations of observed incident data.
+The Unknown Incident is therefore an important failure case for evaluating retrieval quality, uncertainty handling, and abstention separately.
 
-6.6 Unknown Incident
+## 7. Verification Results Across the Two Retrieval Methods
 
-The Unknown Incident had:
+The recorded V2 verification outcomes are summarized below.
 
-No structured classification
+| Incident | Verified Structured RCA | Verified Semantic RCA (Combined) |
+|---|---|---|
+| Missing File | `NEEDS_REVISION` | `NEEDS_REVISION` |
+| UI Selector | `NEEDS_REVISION` | `NEEDS_REVISION` |
+| Network Path | `NEEDS_REVISION` | `NEEDS_REVISION` |
+| Terminal Session | `NEEDS_REVISION` | `NEEDS_REVISION` |
+| Timeout | `NEEDS_REVISION` | `NEEDS_REVISION` |
+| Unknown Incident | `NEEDS_REVISION` | `PASS` |
 
-No structured root-cause retrieval
+Under the recorded V2 results, all six structured cases required revision, while five of the six semantic cases required revision.
 
-No structured recovery retrieval
+The semantic Unknown Incident was the only case that received `PASS`.
 
-Semantic retrieval nevertheless returned three root-cause candidates and
-three recovery candidates with relatively weak similarity scores.
+This distinction matters because a verifier outcome is not itself a complete measure of RCA quality:
 
-The initial Verified Semantic RCA included unsupported domain
-assumptions and an invented UTC timestamp.
+- `NEEDS_REVISION` indicates that the verifier identified issues under its implemented criteria.
+- `PASS` indicates that the verifier did not identify a qualifying violation under those criteria.
+- Neither outcome independently establishes factual correctness.
+- Neither outcome independently establishes that the retrieved knowledge is relevant.
+- A revised report may still contain domain-derived inferences or other residual problems.
 
-The V2 verifier classified the generated RCA as PASS.
+Verifier outcomes must therefore be interpreted alongside the retrieved candidates, the initial report, the revised report, and an independent assessment of the evidence.
 
-The verified revision preserved the appropriate uncertainty:
+The recorded verification outcome should not be changed to imply that the verifier caught the Unknown Incident retrieval problem. In that case, it returned `PASS`.
 
-No confirmed root cause
+## 8. Effect of Verification
 
-Candidate causes explicitly treated as unverified
+### 8.1 Structured RCA vs. Verified Structured RCA
 
-Observed evidence separated from model inference
+Adding V2 verification and revision changed the handling of all six structured cases.
 
-Recovery actions retained without claiming that they had been tested
+The verifier identified substantive grounding problems in each case. Revisions generally:
 
-No incident-specific prevention recommendation
+- Removed unsupported timestamps.
+- Removed unsupported prevention recommendations.
+- Reduced unjustified confidence.
+- Reframed unconfirmed root causes as candidates.
+- Removed unsupported recovery actions where identified.
 
-Low confidence
+However, the revised reports sometimes introduced softer domain-derived explanations or inferences.
 
-However, the verifier did not flag the weak semantic retrieval
-candidates themselves as a retrieval-relevance problem.
+The results therefore suggest that verification-assisted revision can improve grounding behaviour, but do not establish that every revised output is fully evidence-grounded.
 
-This case demonstrates an important distinction between generation
-grounding and retrieval quality: the verifier can preserve uncertainty
-in the generated RCA without providing an abstention mechanism for the
-semantic retriever.
+### 8.2 Semantic RCA vs. Verified Semantic RCA
 
-7. Verification Results Across Structured and Semantic Retrieval
-
-The V2 verification loop produced the following outcomes:
-
-Incident        Verified          Verified         Combined
-Structured        Semantic         Interpretation
-
-Missing File    NEEDS_REVISION    NEEDS_REVISION   Verification
-identified
-substantive grounding
-problems in both
-configurations.
-
-UI Selector     NEEDS_REVISION    NEEDS_REVISION   V2 detected
-unsupported claims
-and retrieval-related
-relevance problems.
-
-Network Path    NEEDS_REVISION    NEEDS_REVISION   V2 detected
-unsupported
-interpretations and
-confidence problems.
-
-Terminal        NEEDS_REVISION    NEEDS_REVISION   V2 detected
-Session                                            unsupported causes,
-recovery, prevention,
-and confidence
-issues.
-
-Timeout         NEEDS_REVISION    NEEDS_REVISION   V2 detected
-unsupported timeout
-interpretation and
-confidence problems.
-
-The Verified Structured and Verified Semantic experiments therefore show
-a substantially different pattern from the earlier verifier evaluation.
-
-Under V2, all six structured cases required revision, while five of the
-six semantic cases required revision.
-
-The semantic Unknown Incident was the only case that received a PASS.
-The final output nevertheless preserved low confidence and explicit
-uncertainty.
-
-This means that the verification result itself should not be treated as
-a direct measure of RCA quality. A PASS indicates that the V2 verifier
-did not identify a substantive grounding violation under its evaluation
-criteria; it does not independently prove that the retrieved knowledge
-is relevant or that the RCA is factually correct.
-
-8. Effect of Verification
-
-The primary verification comparisons are:
-
-8.1 Structured RCA vs Verified Structured RCA
-
-Adding V2 verification and revision changed the behaviour of all six
-structured cases.
-
-The V2 verifier identified substantive grounding problems in each case.
-Revisions generally:
-
-Removed unsupported timestamps
-
-Removed unsupported prevention recommendations
-
-Reduced unjustified confidence
-
-Reframed root causes as candidates when they were not established
-
-Removed unsupported recovery actions where identified
-
-However, the revision stage repeatedly introduced softer domain-derived
-explanations or inferences.
-
-Therefore, verification substantially improves grounding behaviour in
-many cases, but the revision stage is not guaranteed to produce a
-perfectly source-grounded output.
-
-8.2 Semantic RCA vs Verified Semantic RCA
-
-Verification also improved the semantic configuration.
+Verification also affected the semantic configuration.
 
 Across the six cases, the V2 verifier:
 
-Detected substantive grounding problems in five cases
+- Returned `NEEDS_REVISION` for five cases.
+- Removed or corrected some irrelevant recovery actions through revision.
+- Reduced unsupported confidence in several reports.
+- Preserved uncertainty around weakly supported causes.
+- Removed unsupported prevention recommendations in revised reports.
 
-Removed or corrected several irrelevant recovery actions
+The Unknown Incident received `PASS`. Its retrieved candidates nevertheless remained weakly relevant, demonstrating that the implemented verification process did not reliably identify the retrieval-quality problem in this case.
 
-Reduced unsupported confidence
+Verification can therefore help constrain generated content after semantic retrieval, but it does not replace explicit retrieval-quality evaluation or an abstention mechanism.
 
-Preserved uncertainty for weakly supported causes
+### 8.3 Verifier Assessment vs. Revised-Report Evaluation
 
-Removed unsupported prevention recommendations in the revised
-outputs
+The verifier's decision and the quality of the revised report are separate evaluation dimensions.
 
-The Unknown Incident received PASS, but the final RCA still maintained
-low confidence and did not confirm any root cause.
+A verifier may identify problems that a revision subsequently corrects, but the revised report can still contain residual unsupported inferences. Conversely, a `PASS` does not prove that every claim is correct or that the retrieval stage supplied sufficiently relevant knowledge.
 
-The semantic experiment therefore indicates that verification can
-partially compensate for weaknesses introduced by semantic retrieval,
-but it does not replace retrieval-quality controls.
+The case-level observations in this document should therefore be interpreted as qualitative assessments of recorded experiment outputs, not as an independent human-expert validation study.
 
-9. Retrieval vs Verification Comparison
+Future evaluation should explicitly distinguish:
 
-The four configurations allow retrieval and verification to be
-considered as separate system components.
+1. **Verifier assessment:** The recorded `PASS` or `NEEDS_REVISION` outcome.
+2. **Revision behaviour:** The changes made after verification findings.
+3. **Final-report grounding:** Whether each substantive final claim is supported by the permitted evidence.
+4. **Retrieval relevance:** Whether retrieved root-cause and recovery candidates are relevant to the incident.
+5. **Uncertainty handling:** Whether the system appropriately communicates insufficient evidence and refrains from confirming an unsupported diagnosis.
 
-Retrieval effect without verification
+## 9. Retrieval vs. Verification
 
-The comparison:
+The four configurations allow retrieval and verification to be examined as separate components.
 
-Structured RCA
-        vs
-Semantic RCA
+### 9.1 Retrieval Effect Without Verification
 
-shows that semantic retrieval:
+The Structured RCA vs. Semantic RCA comparison indicates that semantic retrieval:
 
-Correctly retrieves the top root cause and recovery action for four
-of five known incidents
+- Correctly ranked the corresponding top root cause and recovery action in four of five known incidents.
+- Failed on the UI-selector case.
+- Returned false-positive candidates for the Unknown Incident.
+- Demonstrated partial robustness to changed wording.
+- Did not apply a similarity threshold or abstention mechanism.
 
-Fails on the UI-selector case
+### 9.2 Verification Effect Under Structured Retrieval
 
-Produces false-positive retrieval for the Unknown Incident
+The Structured RCA vs. Verified Structured RCA comparison indicates that V2 verification can identify grounding errors in single-pass generation.
 
-Provides partial robustness to changed wording
+The verifier identified substantive issues in all six structured cases. Revision generally reduced unsupported claims and improved uncertainty handling, although residual inferences remained.
 
-Does not currently abstain when similarity is weak
+### 9.3 Verification Effect Under Semantic Retrieval
 
-Verification effect under structured retrieval
+The Semantic RCA vs. Verified Semantic RCA comparison indicates that verification can remain useful after semantic retrieval.
 
-The comparison:
+It identified issues involving:
 
-Structured RCA
-        vs
-Verified Structured RCA
+- Unsupported claims
+- Overstated root causes
+- Unsupported recovery actions
+- Unsupported prevention recommendations
+- Incorrect confidence
+- Some retrieval-related relevance problems
 
-shows that V2 verification can identify and correct grounding errors
-that remain in single-pass generation.
+However, the Unknown Incident received `PASS` despite weakly relevant retrieved candidates. Verification therefore did not consistently identify retrieval-quality problems.
 
-The verifier identified substantive problems in all six structured
-cases.
+### 9.4 Retrieval Effect After Verification
 
-Verification effect under semantic retrieval
+The Verified Structured RCA vs. Verified Semantic RCA comparison shows that verification does not eliminate the differences between retrieval methods.
 
-The comparison:
+Semantic retrieval can still introduce:
 
-Semantic RCA
-        vs
-Verified Semantic RCA
+- Weak or neighbouring root-cause candidates
+- Irrelevant recovery candidates
+- False-positive candidates for unknown incidents
 
-shows that verification remains useful after semantic retrieval.
+Revision can remove some of these from the generated report, but it does not independently guarantee retrieval relevance.
 
-It can identify:
+## 10. Evaluation Summary
 
-Unsupported claims
+| Dimension | Structured RCA | Semantic RCA | Verified Structured RCA | Verified Semantic RCA (Combined) |
+|---|---|---|---|---|
+| Classification | Structured | Structured | Structured | Structured |
+| Root-cause retrieval | Structured | Semantic top-k | Structured | Semantic top-k |
+| Recovery retrieval | Structured | Semantic top-k | Structured | Semantic top-k |
+| Initial single-pass generation | Yes | Yes | Yes | Yes |
+| Verification | None | None | V2 | V2 |
+| Revision | None | None | V2 | V2 |
+| Unknown-incident retrieval behaviour | No structured match | Returns top-k candidates | No structured match | Returns top-k candidates |
+| Verification outcome for Unknown Incident | Not applicable | Not applicable | `NEEDS_REVISION` | `PASS` |
+| Explicit grounding audit | None | None | Yes | Yes |
+| Retrieval abstention mechanism | Not applicable to structured no-match behaviour | No calibrated abstention | Not applicable to structured no-match behaviour | No calibrated abstention |
 
-Overstated root causes
+The experiments suggest that the components address different parts of the RCA problem:
 
-Unsupported recovery actions
+- **Structured retrieval** provides deterministic matching against the current taxonomy and knowledge base.
+- **Semantic retrieval** broadens matching beyond exact taxonomy terms.
+- **Verification** audits generated RCA content against the permitted evidence.
+- **Revision** can reduce unsupported claims and improve uncertainty handling.
+- **Retrieval-quality controls** are still required to determine when semantic candidates are insufficiently relevant.
 
-Unsupported prevention
+The Unknown Incident demonstrates why retrieval relevance, verifier assessment, and final-report correctness must be evaluated separately.
 
-Incorrect confidence
-
-Some retrieval relevance problems
-
-However, it does not provide semantic retrieval abstention.
-
-Retrieval effect after verification
-
-The comparison:
-
-Verified Structured RCA
-        vs
-Verified Semantic RCA
-
-shows that verification does not eliminate the differences between the
-retrieval methods.
-
-Semantic retrieval continues to introduce:
-
-Weak or neighbouring root-cause candidates
-
-Irrelevant recovery candidates
-
-False-positive retrieval for unknown incidents
-
-The verifier can remove some of these from the generated RCA, but it
-does not independently guarantee retrieval relevance.
-
-10. Evaluation Summary
-
-The four experiments can be summarized as follows:
-
-Dimension        Structured RCA             Semantic RCA     Verified Structured Verified Semantic
-RCA                 RCA
-
-Classification   Structured                 Structured       Structured          Structured
-
-Root-cause       Structured                 Semantic top-k   Structured          Semantic top-k
-retrieval
-
-Recovery         Structured                 Semantic top-k   Structured          Semantic top-k
-retrieval
-
-Single-pass      Yes                        Yes              Yes, as initial RCA Yes, as initial
-generation                                                                       RCA
-
-Verification     None                       None             V2                  V2
-
-Revision         None                       None             V2                  V2
-
-Unknown          Abstains through           False-positive   Structured          False-positive
-retrieval        classification/retrieval   candidates       abstention          candidates
-path
-
-Grounding audit  None                       None             Explicit            Explicit
-
-The experiments show that each component addresses a different part of
-the RCA problem:
-
-Structured retrieval provides deterministic constraints.
-
-Semantic retrieval broadens matching beyond exact taxonomy terms.
-
-Verification audits generated RCA content against permitted
-evidence.
-
-Revision can reduce unsupported claims and improve uncertainty
-handling.
-
-Semantic retrieval still requires a mechanism for deciding when a
-similarity match is insufficient.
-
-Verification does not eliminate the need for retrieval-quality
-controls.
-
-11. Limitations
+## 11. Limitations
 
 The current evaluation has several limitations:
 
-The evaluation set is small and manually constructed.
+- The evaluation set is small and manually constructed.
+- The knowledge base is relatively small and manually authored.
+- Similarity scores are retrieval scores, not calibrated probabilities.
+- Semantic retrieval uses a fixed top-k value of three.
+- No similarity threshold or calibrated abstention mechanism was applied.
+- The embedding model was not specifically fine-tuned for automation failure logs.
+- The semantic retrieval experiment includes only one additional paraphrased robustness case.
+- The evaluation uses a small number of manually selected incidents.
+- The four-configuration comparison uses the same six core cases, limiting statistical generalization.
+- The same configured LLM, `gpt-oss:20b-cloud`, is used for generation, verification, and revision.
+- LLM outputs may be stochastic, so differences in generated text cannot always be attributed solely to the experimental component.
+- The verifier's judgments are themselves LLM-generated and may contain false positives, false negatives, or inconsistent assessments.
+- Verification does not constitute independent human evaluation.
+- No human expert annotation has yet been used as an independent ground-truth assessment of RCA quality.
+- The revision model can introduce new domain-derived inferences even when the verifier correctly identifies an initial grounding problem.
+- Retrieval relevance and RCA grounding are related but distinct evaluation dimensions.
+- The current verifier does not independently guarantee semantic retrieval relevance.
+- The Unknown Incident demonstrates that semantic nearest-neighbour retrieval can return weak candidates without abstention.
+- The verifier's `PASS` outcome for the semantic Unknown Incident shows that the implemented checks do not reliably detect every retrieval-quality problem.
 
-The knowledge base is relatively small and manually authored.
+These limitations mean that the results should be interpreted as initial controlled engineering experiments rather than evidence of general system performance.
 
-Similarity scores are retrieval scores and are not calibrated
-probabilities.
+## 12. Current Findings
 
-The semantic experiment uses a fixed top-k value of 3.
+The evaluation across the four configurations supports the following findings:
 
-No similarity threshold or abstention mechanism was applied.
+1. **Structured retrieval provides deterministic behaviour** for the current manually defined incident taxonomy and knowledge base when an incident can be classified successfully.
 
-The embedding model was not specifically fine-tuned for automation
-failure logs.
+2. **Semantic retrieval broadened matching but was not consistently reliable.** It correctly ranked the corresponding top root cause and recovery action for four of five known incidents in the shared evaluation. The UI-selector case was the primary known-incident retrieval failure.
 
-The semantic retrieval experiment includes only one additional
-paraphrased robustness case.
+3. **Paraphrase robustness was partial.** The additional paraphrased UI-selector case retrieved related UI and application knowledge but did not retrieve sufficiently specific selector-related information for a reliable diagnosis.
 
-The semantic retrieval evaluation is based on a small number of
-manually selected incidents.
+4. **Unrestricted semantic retrieval produced false-positive candidates.** The Unknown Incident received nearest-neighbour root-cause and recovery candidates despite lacking a known incident classification.
 
-The four-condition comparison uses the same six core incidents,
-limiting statistical generalization.
+5. **V2 verification identified substantive grounding problems in all six structured cases.** The verifier returned `NEEDS_REVISION` for each case in the Verified Structured configuration.
 
-The same LLM model, gpt-oss:20b-cloud, is used for generation,
-verification, and revision.
+6. **V2 verification identified substantive grounding problems in five of six semantic cases.** The semantic Unknown Incident received `PASS`, despite weakly relevant retrieved candidates.
 
-LLM generation, verification, and revision may be stochastic, so
-differences in generated text cannot always be attributed solely to
-the experimental component.
+7. **Verification-assisted revision improved several reports.** It removed or corrected some unsupported claims, recovery actions, prevention recommendations, and confidence assessments.
 
-The verifier's judgments are themselves generated by an LLM and may
-contain false positives, false negatives, or internally inconsistent
-assessments.
+8. **Revision was not perfectly source-grounded.** Some revised reports retained or introduced domain-derived explanations that were not directly established by the available evidence.
 
-Verification does not constitute independent human evaluation.
+9. **Verifier assessment is not equivalent to report correctness.** A `PASS` records the verifier's decision under the implemented criteria; it does not independently establish factual correctness, retrieval relevance, or reliable abstention.
 
-No human expert annotation has yet been used as an independent
-ground-truth evaluation of RCA quality.
+10. **Retrieval relevance and generation grounding require separate evaluation.** The Unknown Incident showed that a report can receive `PASS` even when the retrieved knowledge is weakly relevant to the incident.
 
-The revision model can introduce new domain-derived inferences even
-when the verifier correctly identifies the original grounding
-problem.
+11. **Semantic retrieval and verification address different failure modes.** Semantic retrieval broadens matching, while verification audits generated explanations against permitted evidence. Neither mechanism independently guarantees reliable diagnosis.
 
-Retrieval relevance and RCA grounding are related but distinct
-evaluation dimensions; the current verifier does not independently
-score semantic retrieval quality.
+12. **The four-configuration design supports component-level comparisons.** It provides an initial basis for examining retrieval and verification separately, rather than treating the complete system as a single undifferentiated configuration.
 
-The Unknown Incident case demonstrates that semantic
-nearest-neighbour retrieval can return weak candidates without an
-abstention mechanism.
+Overall, the experiments indicate that reliable automation RCA requires complementary mechanisms: structured knowledge for deterministic constraints, semantic retrieval for broader matching, explicit verification for grounding checks, and retrieval-quality controls for handling insufficiently relevant candidates.
 
-These limitations mean that the results should be interpreted as initial
-controlled engineering experiments rather than evidence of general
-system or model performance.
-
-12. Current Findings
-
-The evaluation across the four configurations produces the following
-findings:
-
-Structured retrieval provides reliable deterministic behaviour for
-the current manually defined incident taxonomy and knowledge base
-when an incident can be classified successfully.
-
-Semantic retrieval correctly ranks the corresponding top root cause
-and recovery action for four of five known incidents in the shared
-six-case evaluation, with the UI-selector case being the primary
-known-incident retrieval failure.
-
-Semantic retrieval provides partial robustness to changed wording
-and exception type, but the additional paraphrased UI-selector case
-did not retrieve sufficiently specific selector knowledge.
-
-Unrestricted semantic nearest-neighbour retrieval produces
-false-positive candidates for the Unknown Incident because the
-current implementation always returns the top three results.
-
-V2 verification identifies substantive grounding problems in all six
-structured cases evaluated in the Verified Structured configuration.
-
-V2 verification identifies substantive grounding problems in five of
-six semantic cases. The semantic Unknown Incident received PASS,
-while its final RCA still preserved low confidence and uncertainty.
-
-Verification can detect not only unsupported generation claims but
-also some retrieval relevance problems, as demonstrated by the
-removal of unrelated recovery actions in the Missing File and
-UI-selector semantic cases.
-
-Verification substantially improves uncertainty handling by
-converting unsupported or overstated causes into candidates or
-undetermined conclusions and by reducing unsupported confidence in
-many cases.
-
-The revision stage is not perfectly source-grounded. Several revised
-RCAs introduced softer domain-derived explanations or inferences
-even after the verifier identified the original grounding problem.
-
-The Unknown Incident demonstrates that generation grounding and
-retrieval abstention are separate problems. The V2 verifier can
-preserve uncertainty in the final RCA while the semantic retriever
-still returns weak candidate knowledge.
-
-Semantic retrieval and verification therefore address different
-failure modes. Semantic retrieval broadens matching, while
-verification constrains generated explanations against permitted
-evidence.
-
-The four-condition design provides a controlled basis for
-distinguishing retrieval effects from verification effects rather
-than treating the final system as a single undifferentiated
-configuration.
-
-Overall, the experiments indicate that reliable automation RCA
-requires multiple complementary mechanisms: structured knowledge
-provides deterministic constraints, semantic retrieval provides
-broader matching, and verification provides an explicit grounding
-audit. None of the individual mechanisms is sufficient on its own
-for reliable RCA across both known and unknown incidents.
-
-These findings form the current evaluation record for the Intelligent
-Automation RCA system. They should be interpreted as findings from the
-current controlled six-case evaluation rather than as generalized
-performance claims.
+These findings apply to the current controlled evaluation and should not be generalized beyond the tested cases without further validation.
