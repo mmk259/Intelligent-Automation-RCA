@@ -1,29 +1,28 @@
+
 # Documentation
 
-This folder contains the design and technical documentation for the **Intelligent Automation RCA** project.
+This directory contains the design and technical documentation for Intelligent Automation RCA.
 
----
+## Architecture and Design
 
-# Contents
+- [`system_architecture.md`](system_architecture.md) — Describes the system components, their responsibilities, and the distinction between the current UiPath-specific implementation and potential future extensions.
+- [`ai_diagnosis_pipeline.md`](ai_diagnosis_pipeline.md) — Explains the incident-processing pipeline, from log parsing through retrieval and RCA generation.
+- [`rca_report_template.md`](rca_report_template.md) — Defines the intended structure and content of an RCA report.
+- [`existing_solutions.md`](existing_solutions.md) — Reviews existing automation-support capabilities and explains the motivation for the project.
 
-## Project Architecture
+## Research Documentation
 
-Describes the overall system architecture, major components, and data flow.
+The following research documents are maintained in the `research/` directory:
 
-## AI Diagnosis Pipeline
+- [`Evaluation.md`](research/Evaluation.md) — Records the experimental configurations, test cases, evaluation results, and case-level observations.
+- [`experimental_methodology.md`](research/experimental_methodology.md) — Documents the experiment design, configurations, evaluation criteria, and limitations.
+- [`findings.md`](research/findings.md) — Summarizes the experimental findings, observed failure modes, limitations, and implications.
 
-Explains how automation execution logs move through parsing, classification, knowledge retrieval, LLM reasoning, and RCA generation.
+## Documentation Guidelines
 
-## RCA Report Template
+Research documentation should reflect the saved experiment results and the behavior of the actual implementation.
 
-Defines the standard structure of the generated Root Cause Analysis (RCA) report.
-
-## Research Existing Solutions
-
-Compares current enterprise automation platforms and identifies the research gap addressed by this project.
-
----
-
-# Purpose
-
-The documentation in this folder provides the architectural foundation of the project and serves as a reference throughout development.
+- Clearly distinguish implemented and evaluated components from planned features.
+- Ensure that reported results are consistent with the saved experiment outputs.
+- Document limitations and failure cases alongside successful outcomes.
+- Avoid claims of reliability or generalizability that are not supported by the experiments.
