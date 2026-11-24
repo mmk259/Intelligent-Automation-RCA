@@ -1,10 +1,10 @@
 # Intelligent Automation RCA
 
-An AI-assisted Root Cause Analysis (RCA) system for diagnosing automation failures from execution logs. The project combines structured incident classification, knowledge-base retrieval, LLM-generated RCA reports, semantic retrieval experiments, and verification-assisted report revision.
+An AI-assisted Root Cause Analysis (RCA) system for diagnosing automation failures from execution logs. The project combines structured incident classification, knowledge-base retrieval, LLM-generated RCA reports, and verification-assisted report revision, alongside experiments with semantic retrieval.
 
 **Current implementation:** UiPath execution-log parsing and a knowledge base containing incident taxonomy, root-cause entries, and recovery actions.
 
-**Research focus:** Evaluating how semantic retrieval and verification-assisted revision affect the relevance, grounding, and uncertainty handling of generated RCA reports.
+**Research focus:** Evaluating how structured versus semantic retrieval, and verification-assisted revision, affect the relevance and evidence-grounding of generated RCA reports, particularly when supporting information is incomplete or uncertain.
 
 ## Problem
 
