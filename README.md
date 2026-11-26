@@ -33,16 +33,26 @@ The implemented pipeline is:
 
 The semantic retrieval and verification components are experimental. Semantic similarity does not guarantee that a retrieved entry is relevant, and verification-assisted revision does not guarantee that every statement in the final report is fully grounded.
 
+
 ## Experimental Configurations
 
-| Configuration | Retrieval | Verification-assisted revision |
-|---|---|---|
-| Structured RCA | Structured | No |
-| Semantic RCA | Semantic | No |
-| Verified Structured RCA | Structured | Yes |
-| Verified Semantic RCA | Semantic | Yes |
+The project evaluates four related experiments involving structured retrieval, semantic retrieval, RCA generation, and verification-assisted revision.
 
-The configurations are compared to examine retrieval behavior, report grounding, uncertainty handling, and the limitations of combining semantic retrieval with verification.
+| Experiment | Retrieval | LLM Generation | Verification |
+|---|---|---|---|
+| Structured RCA | Structured | Yes | No |
+| Semantic Retrieval | Semantic | No | No |
+| Verified Structured RCA | Structured | Yes | Yes |
+| Verified Semantic RCA | Semantic | Yes | Yes |
+
+The Semantic Retrieval experiment evaluates the relevance of retrieved knowledge candidates and does not independently generate an RCA report.
+
+The generated-report experiments evaluate LLM-assisted diagnosis and, where applicable, verification-assisted revision.
+
+Retrieval relevance and generated-report quality are assessed separately because not all configurations produce the same type of output.
+
+The current experiments are exploratory and are limited to the available UiPath incident test cases and knowledge-base coverage.
+
 
 ## Technology Stack
 
