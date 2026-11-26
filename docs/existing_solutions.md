@@ -41,26 +41,25 @@ It helps automations handle variations in application behaviour and interface av
 
 Check App State supports runtime decision-making within an automation workflow. Intelligent Automation RCA focuses on analysing failures after they occur and retrieving relevant diagnostic and recovery information.
 
+## Project Positioning and Motivation
 
-## Positioning of Intelligent Automation RCA
+Existing automation platforms provide capabilities for monitoring automation execution, handling exceptions, retrying failed activities, and assisting with workflow development and recovery. These capabilities address important aspects of automation reliability.
 
-Intelligent Automation RCA explores an AI-assisted approach to diagnosing RPA execution failures.
+Intelligent Automation RCA explores a complementary approach focused on diagnosing RPA execution failures and organizing reusable diagnostic knowledge.
 
-The current implementation focuses on UiPath execution logs and investigates the combination of:
+The current implementation investigates a hybrid architecture combining:
 
-- Log parsing to extract incident information.
-- Taxonomy-based incident classification.
-- Structured knowledge retrieval.
-- Semantic retrieval using embedding-based similarity.
-- LLM-assisted generation of diagnostic reports.
-- An experimental verification and revision stage.
+- **Incident parsing:** Extracting relevant information from UiPath execution logs.
+- **Taxonomy-based classification:** Identifying known incident categories and subcategories.
+- **Structured retrieval:** Retrieving root causes and recovery actions using incident classification.
+- **Semantic retrieval:** Using embedding-based similarity to retrieve potentially relevant root causes and recovery actions from the knowledge base.
+- **LLM-assisted RCA generation:** Generating structured diagnostic reports using incident information and retrieved knowledge.
+- **Verification-assisted revision:** Evaluating generated reports for unsupported claims and revising them to improve evidence grounding and uncertainty handling.
 
-The project evaluates both structured and semantic retrieval approaches for identifying relevant root causes and recovery actions. It also investigates how retrieved knowledge can support LLM-generated diagnoses and how an additional verification stage affects the resulting reports.
+The experiments examine structured and semantic retrieval independently, including their ability to identify relevant knowledge for known incidents and their limitations when handling unfamiliar incidents. Further experiments investigate LLM-generated diagnoses and the effect of verification-assisted revision under both retrieval approaches.
 
-The current implementation is a research-oriented technical prototype focused on incident diagnosis rather than autonomous workflow repair or runtime recovery. Its evaluation examines retrieval relevance, generated diagnoses, and the limitations of the implemented approaches.
+The initial results show that semantic retrieval can identify relevant root causes and recovery actions for several known incident types. However, it can also retrieve weakly related candidates, particularly when the incident is unfamiliar or the available knowledge does not contain a sufficiently relevant match. Verification-assisted revision can improve aspects of generated reports, although it does not eliminate all unsupported reasoning or independently guarantee retrieval relevance.
 
-Unlike workflow retry or UI recovery mechanisms, the project's primary focus is incident diagnosis and the organization of reusable root cause and recovery knowledge.
+The current implementation is a research-oriented technical prototype targeting UiPath execution logs. It does not aim to replace existing platform monitoring, troubleshooting, or self-healing capabilities. Instead, it investigates how structured knowledge, semantic retrieval, and language-model reasoning can be combined to support more systematic automation incident diagnosis.
 
-The current implementation is a research-oriented prototype rather than a complete automation recovery or monitoring platform. Its evaluation investigates retrieval relevance and the behaviour of generated diagnoses under different configurations.
-
-Support for additional automation platforms and more extensive evaluation remain potential future extensions.
+The evaluation remains exploratory and is limited by the size and composition of the current test set.
