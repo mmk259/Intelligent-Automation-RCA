@@ -1,66 +1,76 @@
+
 # Knowledge Base
 
-This folder contains the structured knowledge used by the **Intelligent Automation RCA** platform.
+This directory contains the structured knowledge used by Intelligent Automation RCA for incident classification, root-cause retrieval, and recovery-action retrieval.
 
-The knowledge base enables deterministic reasoning before AI-assisted Root Cause Analysis (RCA) generation.
+The current knowledge base focuses on UiPath automation incidents.
 
----
+## 1. Knowledge Base Files
 
-# Contents
-
-## incident_taxonomy.xlsx
+### incident_taxonomy.xlsx
 
 Contains:
 
-- Taxonomy
-- Incident Catalog
+- **Taxonomy:** Defines incident categories, subcategories, and descriptions.
+- **Incident Catalog:** Maps recognized exception patterns to incident identifiers and taxonomy labels.
 
-Defines the standardized classification of enterprise automation incidents.
+### root_cause_library.xlsx
 
----
+Contains possible root causes associated with incident categories and subcategories.
 
-## recovery_library.xlsx
+Entries include root-cause identifiers, descriptions, qualitative confidence labels, and suggested verification methods.
 
-Maps incident categories to recommended recovery actions.
+Knowledge-base confidence labels are qualitative and should not be interpreted as calibrated probabilities.
 
-Examples include:
+### recovery_library.xlsx
 
-- Retry strategies
-- Selector validation
-- Application restart
-- Terminal reconnection
-- File verification
+Contains suggested recovery actions associated with incident categories and subcategories.
 
-Additional recovery strategies will be added as support for more enterprise automation platforms is introduced.
+Entries include recovery identifiers, recommended actions, automation levels, and additional notes.
 
----
+Recovery actions should be reviewed against the actual incident context before execution.
 
-## root_cause_library.xlsx
+## 2. Knowledge Base Usage
 
-Maps incident categories to probable root causes.
+The knowledge base supports:
 
-Examples include:
+- Rule-based incident classification.
+- Structured root-cause retrieval.
+- Structured recovery-action retrieval.
+- Embedding-based semantic retrieval.
+- Context provision for LLM-assisted RCA generation.
 
-- Dynamic selectors
-- Missing files
-- Session expiration
-- Network failures
-- Invalid configuration
+Retrieved knowledge represents possible explanations and recovery strategies. It does not independently establish the actual cause of an incident.
 
-The library is designed to grow continuously as new incident patterns are identified.
+## 3. Scope and Coverage
 
----
+The current implementation focuses on UiPath incident patterns represented in the supplied workbooks.
 
-# Purpose
+Coverage is limited to the categories, exception patterns, root causes, and recovery actions currently included.
 
-The knowledge base enables the platform to:
+Incidents outside this coverage may remain unclassified or return weakly relevant semantic retrieval candidates.
 
-- Classify automation incidents
-- Retrieve structured incident knowledge
-- Recommend recovery actions
-- Ground AI reasoning in validated knowledge
-- Reduce LLM hallucinations
-- Improve the consistency and explainability of generated RCA reports
+Support for additional automation platforms is considered future work.
 
-The initial implementation focuses on UiPath incident knowledge. The overall knowledge base architecture is designed to support multiple enterprise automation platforms through a common incident taxonomy and extensible platform-specific knowledge.
-``
+## 4. Provenance and Maintenance
+
+New knowledge-base entries should have traceable sources and review information.
+
+Recommended maintenance information includes:
+
+- Entry identifier
+- Source or reference
+- Source type
+- Whether the entry is manually authored or source-derived
+- Validation status
+- Last reviewed date
+
+Entries should not be described as independently validated unless a defined validation process has been completed.
+
+## 5. Limitations
+
+- Knowledge-base coverage is finite.
+- Root causes represent possible explanations, not confirmed diagnoses.
+- Recovery actions may require human review.
+- Semantic similarity does not guarantee incident-specific relevance.
+- Retrieval quality depends on the coverage and quality of the knowledge base.
