@@ -1,111 +1,60 @@
-# Related Work and Existing Solutions
+
+# Existing Automation Capabilities
 
 ## Introduction
 
-Enterprise automation has evolved from rule-based Robotic Process Automation (RPA) toward Intelligent Automation, where artificial intelligence assists in automation development, monitoring, exception handling, and decision support. As automation adoption has increased across industries, organizations have faced growing challenges in diagnosing automation failures efficiently while maintaining service reliability.
+Enterprise automation platforms provide capabilities for handling execution failures, improving workflow resilience, and assisting developers in building and maintaining automations.
 
-Recent research has explored AI-driven approaches for software log analysis, anomaly detection, fault diagnosis, and root cause analysis. At the same time, commercial enterprise automation platforms have introduced AI-powered assistants, monitoring systems, and self-healing capabilities. However, existing solutions primarily focus on workflow execution, recovery, or developer assistance rather than providing a unified AI-assisted incident diagnosis framework.
+This project focuses on a related but distinct problem: analysing automation incidents, identifying potential root causes, and retrieving relevant recovery guidance from a structured knowledge base.
 
----
-
-# Academic Research
-
-## AI for Log Analysis
-
-Modern software systems generate large volumes of execution logs that contain valuable diagnostic information. Numerous studies have investigated machine learning and deep learning techniques for automated log parsing, anomaly detection, and failure prediction.
-
-Recent work has also explored Large Language Models (LLMs) for software maintenance tasks such as log interpretation, debugging assistance, and incident summarization. These approaches demonstrate strong natural language reasoning capabilities but often lack structured domain knowledge, making them susceptible to hallucinations or inconsistent explanations when used independently.
-
----
-
-## Root Cause Analysis
-
-Root Cause Analysis (RCA) has traditionally relied on manual investigation supported by domain experts.
-
-Research has proposed various approaches including:
-
-- Rule-based diagnosis
-- Knowledge graphs
-- Bayesian networks
-- Machine learning classifiers
-- Graph-based dependency analysis
-- LLM-assisted reasoning
-
-While these methods improve diagnosis accuracy, many require extensive historical datasets, handcrafted rules, or complex infrastructure.
-
----
-
-## Knowledge-Augmented AI
-
-Recent research increasingly combines structured knowledge with generative AI.
-
-Rather than relying solely on LLM reasoning, these hybrid systems retrieve validated information from knowledge bases before generating responses. Retrieval-Augmented Generation (RAG) has become one of the most promising approaches for improving factual consistency and reducing hallucinations.
-
-This design philosophy directly motivates the architecture of the proposed system.
-
----
-
-# Commercial Enterprise Automation Platforms
+The following sections describe selected UiPath capabilities relevant to automation failure handling and explain how their scope relates to Intelligent Automation RCA.
 
 ## UiPath
 
-UiPath provides several AI-assisted capabilities including:
+UiPath provides several capabilities that help developers and organizations handle automation failures and improve workflow reliability.
 
-- Healing Agent
-- Autopilot
-- Retry Scope
-- Check App State
-- Element Exists
-- AI Center
+### Healing Agent
 
-These tools improve automation resilience, developer productivity, and runtime recovery.
+UiPath Healing Agent provides AI-assisted capabilities for recovering from certain UI automation failures. It helps address changes in application interfaces and UI elements that can cause automations to fail.
 
-However, public documentation primarily emphasizes automation execution and self-healing rather than structured incident diagnosis supported by reusable organizational knowledge.
+**Relation to Intelligent Automation RCA:**
 
----
+Healing Agent focuses on recovering automation execution. Intelligent Automation RCA instead investigates execution failures and produces structured diagnostic information. The two approaches address different aspects of automation reliability.
 
-## Automation Anywhere
+### Retry Scope
 
-Automation Anywhere offers enterprise automation together with AI-powered automation, orchestration, analytics, and monitoring.
+Retry Scope is a UiPath workflow activity that repeatedly executes specified activities until a configured condition is met or the retry limit is reached.
 
-Its platform provides extensive operational visibility but does not publicly describe a dedicated AI-assisted RCA workflow combining historical incident knowledge, taxonomy-driven classification, and standardized RCA generation.
+It is useful for handling temporary failures, such as operations that may succeed after another attempt.
 
----
+**Relation to Intelligent Automation RCA:**
 
-## Microsoft Power Automate
+Retry Scope provides a mechanism for retrying workflow execution. It does not, by itself, provide the broader incident classification and knowledge-based root cause analysis implemented in this project.
 
-Microsoft Power Automate integrates workflow automation with monitoring, cloud execution, and AI Builder.
+### Check App State
 
-The platform provides execution history and operational diagnostics but largely relies on users to investigate failures manually.
+Check App State checks the state of an application or UI element and allows a workflow to follow different execution paths depending on the observed state.
 
----
+It helps automations handle variations in application behaviour and interface availability.
 
-## Enterprise Monitoring Platforms
+**Relation to Intelligent Automation RCA:**
 
-Enterprise observability platforms such as Splunk, Dynatrace, Datadog, and Elastic provide powerful log aggregation, anomaly detection, and monitoring capabilities.
+Check App State supports runtime decision-making within an automation workflow. Intelligent Automation RCA focuses on analysing failures after they occur and retrieving relevant diagnostic and recovery information.
 
-These platforms excel at identifying abnormal system behavior but are generally not designed specifically for enterprise automation incident diagnosis or automation-specific RCA generation.
+## Positioning of Intelligent Automation RCA
 
----
+Intelligent Automation RCA explores an AI-assisted approach to diagnosing RPA execution failures.
 
+The current implementation focuses on UiPath execution logs and combines:
 
-## Research Gap and Project Motivation
-
-Commercial automation platforms provide capabilities for monitoring, troubleshooting, exception handling, and, in some cases, AI-assisted recommendations or self-healing. Existing research has also explored automated log analysis, anomaly detection, failure prediction, and root-cause diagnosis.
-
-Retrieval-Augmented Generation provides a mechanism for incorporating external knowledge into language-model responses. However, retrieving relevant information does not necessarily establish that the retrieved information is applicable to a particular incident or that a generated explanation is fully supported by the available evidence.
-
-Intelligent Automation RCA investigates a combination of:
-
+- Log parsing to extract incident information.
 - Taxonomy-based incident classification.
-- Structured retrieval of root-cause and recovery knowledge.
-- Embedding-based semantic retrieval.
-- LLM-assisted generation of structured RCA reports.
-- Verification-assisted revision of generated reports.
+- Structured and semantic knowledge retrieval.
+- LLM-assisted generation of diagnostic reports.
+- An experimental verification and revision stage.
 
-The current implementation focuses on UiPath execution logs and a manually assembled knowledge base. Its experiments examine retrieval relevance, evidence grounding, uncertainty handling, and the limitations of verification-assisted revision.
+Unlike workflow retry or UI recovery mechanisms, the project's primary focus is incident diagnosis and the organization of reusable root cause and recovery knowledge.
 
-The project does not aim to replace existing automation-platform troubleshooting or self-healing capabilities. Instead, it explores an engineering-oriented approach to organizing incident evidence and reusable diagnostic knowledge into a structured RCA workflow.
+The current implementation is a research-oriented prototype rather than a complete automation recovery or monitoring platform. Its evaluation investigates retrieval relevance and the behaviour of generated diagnoses under different configurations.
 
-The findings are exploratory and are limited by the size, composition, and coverage of the current test set.
-
+Support for additional automation platforms and more extensive evaluation remain potential future extensions.
