@@ -41,17 +41,23 @@ It helps automations handle variations in application behaviour and interface av
 
 Check App State supports runtime decision-making within an automation workflow. Intelligent Automation RCA focuses on analysing failures after they occur and retrieving relevant diagnostic and recovery information.
 
+
 ## Positioning of Intelligent Automation RCA
 
 Intelligent Automation RCA explores an AI-assisted approach to diagnosing RPA execution failures.
 
-The current implementation focuses on UiPath execution logs and combines:
+The current implementation focuses on UiPath execution logs and investigates the combination of:
 
 - Log parsing to extract incident information.
 - Taxonomy-based incident classification.
-- Structured and semantic knowledge retrieval.
+- Structured knowledge retrieval.
+- Semantic retrieval using embedding-based similarity.
 - LLM-assisted generation of diagnostic reports.
 - An experimental verification and revision stage.
+
+The project evaluates both structured and semantic retrieval approaches for identifying relevant root causes and recovery actions. It also investigates how retrieved knowledge can support LLM-generated diagnoses and how an additional verification stage affects the resulting reports.
+
+The current implementation is a research-oriented technical prototype focused on incident diagnosis rather than autonomous workflow repair or runtime recovery. Its evaluation examines retrieval relevance, generated diagnoses, and the limitations of the implemented approaches.
 
 Unlike workflow retry or UI recovery mechanisms, the project's primary focus is incident diagnosis and the organization of reusable root cause and recovery knowledge.
 
