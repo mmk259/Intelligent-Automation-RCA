@@ -8,7 +8,7 @@ This directory contains the technical design, architecture, and research context
 - [System Architecture](system_architecture.md) — Describes the system components, responsibilities, and overall architecture.
 - [AI Diagnosis Pipeline](ai_diagnosis_pipeline.md) — Explains incident parsing, classification, knowledge retrieval, RCA generation, and verification-assisted revision.
 - [RCA Report Template](rca_report_template.md) — Provides a reference structure for presenting root-cause analysis results.
-- [Existing Solutions and Related Work](existing_solutions.md) — Discusses related automation-platform capabilities and relevant research.
+- [Existing RPA Recovery Capabilities](existing_solutions.md) — Describes selected UiPath capabilities for automation failure handling and explains how their scope differs from Intelligent Automation RCA.
 
 ## Research Documentation
 
