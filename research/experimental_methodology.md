@@ -3,9 +3,9 @@
 
 ## 1. Objective
 
-The experiments investigate how retrieval strategy and verification-assisted revision affect AI-generated Root Cause Analysis (RCA) reports for automation incidents.
+The experiments investigate retrieval strategies and verification-assisted revision in the Intelligent Automation RCA system.
 
-The evaluation focuses on three distinct questions:
+The evaluation focuses on three principal questions:
 
 1. **Retrieval relevance:** Does the retrieval component return knowledge relevant to the incident?
 2. **Evidence grounding:** Does the generated RCA distinguish observed evidence from retrieved knowledge and unverified hypotheses?
@@ -15,22 +15,29 @@ These questions are evaluated separately because relevant retrieval does not gua
 
 ## 2. Experimental Configurations
 
-Four configurations are evaluated.
+Four evaluation paths are documented. They do not represent four equivalent RCA-generation configurations because the standalone semantic retrieval experiment does not perform LLM generation.
 
-| Configuration | Retrieval Strategy | Verification-Assisted Revision |
-|---|---|---|
-| Structured RCA | Structured retrieval | Disabled |
-| Semantic RCA | Embedding-based semantic retrieval | Disabled |
-| Verified Structured RCA | Structured retrieval | Enabled |
-| Verified Semantic RCA (Combined) | Embedding-based semantic retrieval | Enabled |
+| Evaluation Path | Retrieval Strategy | LLM Generation | Verification-Assisted Revision |
+|---|---|---|---|
+| Structured RCA Baseline | Structured retrieval | Enabled | Disabled |
+| Semantic Retrieval Evaluation | Embedding-based semantic retrieval | Disabled | Disabled |
+| Verified Structured RCA | Structured retrieval | Enabled | Enabled |
+| Verified Semantic RCA (Combined) | Embedding-based semantic retrieval | Enabled | Enabled |
 
-The Structured RCA configuration serves as the baseline. Semantic RCA evaluates embedding-based retrieval, while the two verified configurations examine the effects of verification-assisted revision under each retrieval strategy.
+The evaluation paths serve different purposes:
 
-The same six core incident cases are used across the configurations wherever the corresponding experiment is supported.
+- **Structured RCA Baseline:** Provides the baseline structured retrieval and single-pass RCA generation workflow.
+- **Semantic Retrieval Evaluation:** Examines semantic retrieval relevance independently of LLM-based RCA generation.
+- **Verified Structured RCA:** Examines verification-assisted revision following structured retrieval and initial RCA generation.
+- **Verified Semantic RCA (Combined):** Examines semantic retrieval followed by LLM-based RCA generation and verification-assisted revision.
+
+The saved experiments do not include a standalone semantic retrieval configuration with single-pass LLM generation and without verification.
+
+Consequently, the effect of adding verification to semantic RCA generation cannot be isolated through a direct baseline comparison in the current experiments.
 
 ## 3. Test Cases
 
-The shared test set contains six incident cases:
+The shared evaluation set contains six incident cases:
 
 1. Missing File
 2. UI Selector
@@ -39,9 +46,13 @@ The shared test set contains six incident cases:
 5. Timeout
 6. Unknown Incident
 
-An additional paraphrased UI-selector case was used to examine whether semantic retrieval could return relevant knowledge when the wording differed from the exact UI-selector test.
+The semantic retrieval experiment additionally includes one paraphrased UI-selector case.
 
-This additional case is treated as a robustness test rather than a seventh independent incident category.
+This additional case examines whether semantic retrieval can identify related knowledge when the incident wording and exception type differ from the original test case.
+
+It is treated as a retrieval robustness test rather than a seventh independent incident category.
+
+The same six core cases are reused across the saved experiments wherever the corresponding evaluation path is supported.
 
 ## 4. Semantic Retrieval
 
@@ -51,30 +62,32 @@ The configured retrieval depth is `top_k = 3`.
 
 Root-cause entries and recovery actions are embedded and ranked separately. The incident query incorporates available exception information, classification fields, workflow information, and activity information.
 
-The experiment examines:
+The standalone semantic retrieval experiment evaluates:
 
-- Whether the top-ranked root-cause entries are relevant to the known incident.
-- Whether the top-ranked recovery actions are appropriate for the incident.
+- Whether the top-ranked root-cause entries are relevant to known incidents.
+- Whether the top-ranked recovery actions are appropriate for the incidents.
 - Whether semantic retrieval returns weakly relevant candidates for an unknown incident.
-- Whether retrieval remains useful when the wording or exception type changes.
+- Whether retrieval remains useful when incident wording or exception types change.
 
-No calibrated retrieval-abstention threshold is used in the reported experiment. Similarity ranking is therefore not treated as proof that a candidate is relevant.
+No calibrated retrieval-abstention threshold is used in the reported experiment.
 
-Retrieval relevance is assessed separately from the quality of the generated RCA report.
+Similarity ranking is therefore not treated as proof that a candidate is relevant.
+
+The semantic retrieval experiment does not perform LLM-based RCA generation. Its results are evaluated as retrieval outputs rather than generated diagnostic reports.
 
 ## 5. Verification-Assisted Revision
 
 The verified configurations generate an initial RCA, submit it to a verification stage, and use the verification findings to request a revised report when required.
 
-The evaluation examines whether the process identifies or removes:
+The verification process examines potential issues including:
 
-- Unsupported claims and assumptions
-- Details presented as evidence that were not supplied
-- Root causes not supported by incident information or retrieved knowledge
-- Recovery actions not supported by retrieved knowledge
-- Incorrect confidence assessments
-- Unsupported prevention recommendations
-- Inadequate handling of insufficient evidence
+- Unsupported claims and assumptions.
+- Details presented as evidence that were not supplied.
+- Root causes not supported by incident information or retrieved knowledge.
+- Recovery actions not supported by retrieved knowledge.
+- Incorrect confidence assessments.
+- Unsupported prevention recommendations.
+- Inadequate handling of insufficient evidence.
 
 Three aspects are considered separately:
 
@@ -88,11 +101,13 @@ A verification result is an assessment produced by the implemented verifier. It 
 
 ### 6.1 Retrieval Relevance
 
-Assess whether the retrieved root-cause entries and recovery actions are relevant to the incident.
+Assess whether retrieved root-cause entries and recovery actions are relevant to the incident.
 
-For known incidents, compare the retrieved entries with the expected knowledge. For the Unknown Incident, examine whether the system returns candidates despite insufficient relevance.
+For known incidents, compare retrieved entries with the expected knowledge.
 
-Retrieval relevance is evaluated independently of the verifier's assessment of the generated report.
+For the Unknown Incident, examine whether the system returns candidates despite insufficient relevance.
+
+Retrieval relevance is evaluated independently of the verifier's assessment of generated reports.
 
 ### 6.2 Classification
 
@@ -128,24 +143,25 @@ In particular, examine whether:
 - Semantic retrieval returns weakly relevant nearest-neighbour candidates.
 - The system distinguishes candidate knowledge from incident-specific evidence.
 - The verifier identifies grounding problems in the generated report.
-- The system abstains from confirming a root cause when the evidence is insufficient.
+- The system abstains from confirming a root cause when evidence is insufficient.
 
 A verifier `PASS` does not independently demonstrate successful unknown-incident handling or reliable retrieval abstention.
 
 ## 7. Comparison Strategy
 
-The four configurations support the following comparisons:
+The available results support the following comparisons:
 
 | Comparison | Evaluation Purpose |
 |---|---|
-| Structured RCA vs. Semantic RCA | Examines the effect of retrieval strategy without verification-assisted revision. |
-| Structured RCA vs. Verified Structured RCA | Examines the effect of verification-assisted revision with structured retrieval. |
-| Semantic RCA vs. Verified Semantic RCA | Examines the effect of verification-assisted revision with semantic retrieval. |
-| Verified Structured RCA vs. Verified Semantic RCA | Compares retrieval strategies when verification-assisted revision is enabled. |
+| Structured retrieval vs. Semantic retrieval | Compares retrieval relevance for the shared incident cases. |
+| Structured RCA Baseline vs. Verified Structured RCA | Examines verification-assisted revision under structured retrieval. |
+| Verified Structured RCA vs. Verified Semantic RCA | Compares the two retrieval strategies when LLM generation and verification-assisted revision are enabled. |
 
-These comparisons are controlled in design intent. Their interpretation still depends on the consistency of model settings, prompts, test inputs, and evaluation procedures across configurations.
+The standalone semantic retrieval evaluation cannot be directly compared with Verified Semantic RCA to isolate the effect of verification on generated report quality because the standalone retrieval experiment does not generate RCA reports.
 
-The results should also be interpreted in light of the small test set and the qualitative nature of the case-level assessments.
+The current experiments therefore do not establish a complete controlled comparison of verification effects under both retrieval strategies.
+
+The comparisons should also be interpreted in light of the consistency of model settings, prompts, test inputs, and evaluation procedures.
 
 ## 8. Limitations
 
@@ -157,6 +173,7 @@ The principal limitations are:
 - The paraphrased UI-selector case tests one variation in wording and does not establish broad robustness to paraphrasing.
 - Semantic similarity can rank related but irrelevant entries.
 - The fixed top-k retrieval configuration does not include a calibrated abstention threshold.
+- The standalone semantic retrieval experiment does not include an unverified LLM-generation baseline.
 - Verification-assisted revision can improve some aspects of a report while introducing new unsupported reasoning.
 - The verifier is LLM-based and may fail to identify grounding or retrieval-quality problems.
 - A verifier's `PASS` does not independently establish report correctness.
@@ -173,11 +190,11 @@ The experimental design treats retrieval relevance, evidence grounding, uncertai
 This separation is important because:
 
 - Relevant retrieved knowledge can still be used incorrectly in a generated report.
-- A report can appear grounded while relying on weakly relevant retrieved candidates.
-- Verification can identify unsupported claims without identifying every retrieval-quality problem.
-- Revision can remove unsupported statements while introducing new assumptions.
-- A verifier's `PASS` does not guarantee that the report is correct or that the system has reliably handled an unknown incident.
+- A report can contain unsupported statements even when retrieval is relevant.
+- Semantic similarity can return candidates for incidents that have no sufficiently relevant knowledge-base match.
+- Verification can identify some grounding problems without guaranteeing that the revised report is fully grounded.
+- Unknown incidents require explicit consideration of retrieval relevance and uncertainty.
 
-Future evaluations should therefore assess retrieval relevance independently, track changes between initial and revised reports, and investigate calibrated abstention when the available knowledge is insufficient.
+Future experiments should include an unverified semantic RCA generation baseline to isolate the effect of verification under semantic retrieval.
 
-The current methodology provides an initial framework for comparing structured retrieval, semantic retrieval, and verification-assisted revision. Broader conclusions will require larger test sets, reproducible evaluation procedures, and independent assessment of final-report quality.
+A calibrated retrieval-abstention mechanism and independent human assessment would also strengthen the evaluation.
