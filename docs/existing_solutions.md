@@ -88,36 +88,24 @@ These platforms excel at identifying abnormal system behavior but are generally 
 
 ---
 
-# Research Gap
 
-The literature and commercial platforms demonstrate significant progress in:
+## Research Gap and Project Motivation
 
-- Automation monitoring
-- Anomaly detection
-- Self-healing
-- AI-assisted development
-- Software log analysis
+Commercial automation platforms provide capabilities for monitoring, troubleshooting, exception handling, and, in some cases, AI-assisted recommendations or self-healing. Existing research has also explored automated log analysis, anomaly detection, failure prediction, and root-cause diagnosis.
 
-Nevertheless, a gap remains between **detecting** an automation failure and **explaining** it in a structured, reusable, engineering-oriented manner.
+Retrieval-Augmented Generation provides a mechanism for incorporating external knowledge into language-model responses. However, retrieving relevant information does not necessarily establish that the retrieved information is applicable to a particular incident or that a generated explanation is fully supported by the available evidence.
 
-Specifically, existing approaches rarely integrate:
+Intelligent Automation RCA investigates a combination of:
 
-- Structured incident taxonomies
-- Historical incident knowledge
-- Validated recovery strategies
-- Deterministic knowledge retrieval
-- Large Language Model (LLM) reasoning
+- Taxonomy-based incident classification.
+- Structured retrieval of root-cause and recovery knowledge.
+- Embedding-based semantic retrieval.
+- LLM-assisted generation of structured RCA reports.
+- Verification-assisted revision of generated reports.
 
-within a single architecture dedicated to enterprise automation incident diagnosis.
+The current implementation focuses on UiPath execution logs and a manually assembled knowledge base. Its experiments examine retrieval relevance, evidence grounding, uncertainty handling, and the limitations of verification-assisted revision.
 
----
+The project does not aim to replace existing automation-platform troubleshooting or self-healing capabilities. Instead, it explores an engineering-oriented approach to organizing incident evidence and reusable diagnostic knowledge into a structured RCA workflow.
 
-# Motivation for Intelligent Automation RCA
+The findings are exploratory and are limited by the size, composition, and coverage of the current test set.
 
-The proposed **Intelligent Automation RCA** platform addresses this gap through a hybrid AI architecture.
-
-Instead of relying solely on generative AI, the platform combines deterministic knowledge retrieval with LLM reasoning to produce transparent, explainable, and standardized Root Cause Analysis (RCA) reports.
-
-The architecture is designed around platform-specific connectors that ingest execution data from enterprise automation platforms. The initial implementation targets UiPath, while the core AI diagnosis engine remains platform-independent.
-
-Future work aims to extend support to additional enterprise automation platforms, making the framework broadly applicable across modern Intelligent Automation ecosystems.
